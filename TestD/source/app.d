@@ -2,8 +2,7 @@ import std.stdio;
 
 void main()
 {
-	writeln("Привет, МАМА!");
-	writeln("Привет, МАМА!!");
-	writeln("Привет, МАМА!!!");
-	writeln("Привет, ПАПА!!!");
+for(int i = 0; i < 10; i++)
+{
+     writeln(i, ") Привет МАМА!!!", );
 }
