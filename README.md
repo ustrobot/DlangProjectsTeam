@@ -1,3 +1,4 @@
 # DlangProjectsTeam
 Test projects with dlang
-Я тоже тут учавсвую
+Я тоже тут учавствую
+Привет мир!
