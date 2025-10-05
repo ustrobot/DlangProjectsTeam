@@ -1,0 +1,16 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/dlang-ai-client
+dlang-ai-client.so
+dlang-ai-client.dylib
+dlang-ai-client.dll
+dlang-ai-client.a
+dlang-ai-client.lib
+dlang-ai-client-test-*
+*.exe
+*.pdb
+*.o
+*.obj
+*.lst

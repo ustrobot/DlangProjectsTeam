@@ -1,0 +1,13 @@
+{
+	"authors": [
+		"grolm"
+	],
+	"copyright": "Copyright © 2025, grolm",
+	"dependencies": {
+		"dlangui": "~>0.10.8",
+		"vibe-d": "~>0.10.2"
+	},
+	"description": "Dlang AI client written using dlangui",
+	"license": "proprietary",
+	"name": "dlang-ai-client"
+}
