@@ -14,3 +14,4 @@ dlang-ai-client-test-*
 *.o
 *.obj
 *.lst
+.env
