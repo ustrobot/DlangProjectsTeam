@@ -1,11 +1,14 @@
 module ui.chat_window;
-
+import std.array;
+import std.algorithm;
+import std.stdio;
 import std.conv : to;
 import dlangui;
 
 import llm.chat_context;
 import llm.llm_client;
 import llm.message;
+import ui.settings_dialog;
 
 /**
  * ChatWindow encapsulates the entire chat UI and interactions.
@@ -18,6 +21,7 @@ class ChatWindow
     private EditLine _promptField;
     private Button _sendBtn;
     private Button _clearBtn;
+    private Button _settingsBtn;
     private ChatContext _chatContext;
     private LLMClient _client;
 
@@ -26,12 +30,24 @@ class ChatWindow
         _chatContext = chatContext;
         _client = client;
 
-        _window = Platform.instance.createWindow("Dlang AI Client", null);
+        _window = Platform.instance.createWindow("Dlang AI Client", null,  WindowFlag.Resizable, 1200, 900);
 
         auto root = new VerticalLayout();
         root.layoutWidth = FILL_PARENT;
         root.layoutHeight = FILL_PARENT;
         _window.mainWidget = root;
+
+        // Top bar with Settings button
+        auto topBar = new HorizontalLayout();
+        topBar.layoutWidth = FILL_PARENT;
+        topBar.layoutHeight = WRAP_CONTENT;
+        root.addChild(topBar);
+
+        _settingsBtn = new Button();
+        _settingsBtn.text = "Settings";
+        _settingsBtn.layoutWidth = WRAP_CONTENT;
+        _settingsBtn.layoutHeight = WRAP_CONTENT;
+        topBar.addChild(_settingsBtn);
 
         _chatText = new EditBox("");
         _chatText.readOnly = true;
@@ -63,11 +79,13 @@ class ChatWindow
         _clearBtn.layoutWidth = WRAP_CONTENT;
         _clearBtn.layoutHeight = WRAP_CONTENT;
         inputRow.addChild(_clearBtn);
+        
 
         // Wire events
         _sendBtn.click = &onSendClicked;
         _promptField.keyEvent = &onPromptKeyEvent;
         _clearBtn.click = &onClearClicked;
+        _settingsBtn.click = &onSettingsClicked;
     }
 
     void show()
@@ -126,6 +144,18 @@ class ChatWindow
     {
         _chatText.text = "";
         _chatContext.clear();
+        return true;
+    }
+
+    private void showSettingsDialog()
+    {
+        auto settingsDialog = new SettingsDialog(_chatContext, _client, _window);
+        settingsDialog.show();
+    }
+
+    private bool onSettingsClicked(Widget w)
+    {
+        showSettingsDialog();
         return true;
     }
 }

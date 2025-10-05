@@ -20,11 +20,10 @@ extern (C) int UIAppMain(string[] args)
 	{
 		stderr.writeln("GROQ_API_KEY is not set; UI will open but Send will fail.");
 	}
-	auto chatContext = new ChatContext(apiKey);
-	chatContext.addMessage(ChatMessage("system", "You are a concise assistant."));
+    auto chatContext = new ChatContext(apiKey, "You are a concise assistant.");
 
 	// LLM client and ChatWindow
-	auto client = new LLMClient();
+    auto client = new LLMClient("https://api.groq.com/openai/v1/", ModelIds.llama_3_1_8b_instant);
 	auto window = new ChatWindow(chatContext, client);
 	window.show();
 	return Platform.instance.enterMessageLoop();

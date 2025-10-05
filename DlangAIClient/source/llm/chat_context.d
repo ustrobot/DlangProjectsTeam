@@ -9,10 +9,12 @@ class ChatContext
 {
     private ChatMessage[] _messages;
     private string _apiKey;
+    private string _systemMessage;
 
-    this(string apiKey)
+    this(string apiKey, string systemMessage = "")
     {
         _apiKey = apiKey;
+        _systemMessage = systemMessage;
     }
 
     @property string apiKey() const
@@ -33,6 +35,37 @@ class ChatContext
     void clear()
     {
         _messages.length = 0;
+    }
+
+    @property string systemMessage() const
+    {
+        return _systemMessage;
+    }
+
+    @property void systemMessage(string value)
+    {
+        _systemMessage = value;
+        // ensure the first message in the history reflects the system prompt
+        // if empty, remove any existing system message; else set/update it at index 0
+        bool hasSystemAtZero = _messages.length > 0 && _messages[0].role == "system";
+        if (value.length == 0)
+        {
+            if (hasSystemAtZero)
+            {
+                // drop the first element
+                _messages = _messages[1 .. $].dup;
+            }
+            return;
+        }
+        auto sysMsg = ChatMessage("system", value);
+        if (hasSystemAtZero)
+        {
+            _messages[0] = sysMsg;
+        }
+        else
+        {
+            _messages = [sysMsg] ~ _messages;
+        }
     }
 }
 

@@ -98,10 +98,48 @@ class LLMClient
     private string _baseUrl;
     private string _model;
 
-    this(string baseUrl = "https://api.groq.com/openai/v1/", string model = ModelIds.deepseek_r1_distill_llama_70b)
+    this(string baseUrl, string model)
     {
         _baseUrl = baseUrl.stripRight("/");
         _model = model;
+    }
+
+    @property string model() const
+    {
+        return _model;
+    }
+
+    @property void model(string newModel)
+    {
+        _model = newModel;
+    }
+
+    /// Returns a curated list of supported model identifiers
+    static string[] supportedModels()
+    {
+        return [
+            ModelIds.allam_2_7b,
+            ModelIds.deepseek_r1_distill_llama_70b,
+            ModelIds.gemma2_9b_it,
+            ModelIds.groq_compound,
+            ModelIds.groq_compound_mini,
+            ModelIds.llama_3_1_8b_instant,
+            ModelIds.llama_3_3_70b_versatile,
+            ModelIds.meta_llama_llama_4_maverick_17b_128e_instruct,
+            ModelIds.meta_llama_llama_4_scout_17b_16e_instruct,
+            ModelIds.meta_llama_llama_guard_4_12b,
+            ModelIds.meta_llama_llama_prompt_guard_2_22m,
+            ModelIds.meta_llama_llama_prompt_guard_2_86m,
+            ModelIds.moonshotai_kimi_k2_instruct,
+            ModelIds.moonshotai_kimi_k2_instruct_0905,
+            ModelIds.openai_gpt_oss_120b,
+            ModelIds.openai_gpt_oss_20b,
+            ModelIds.playai_tts,
+            ModelIds.playai_tts_arabic,
+            ModelIds.qwen_qwen3_32b,
+            ModelIds.whisper_large_v3,
+            ModelIds.whisper_large_v3_turbo,
+        ];
     }
 
     string chatCompletion(ChatContext ctx)
