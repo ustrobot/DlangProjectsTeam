@@ -15,6 +15,9 @@ import std.encoding; // transcode
 import std.utf;       // validate
 
 // Fix UTF-8 text that was mis-decoded as Windows-1252/Latin-1.
+//  * It decodes the UTF-8 string into Unicode code points, then re-encodes those code points into Latin‑1 bytes, writing them into a Latin1String buffer.
+//  * Practically: each code point in U+0000..U+00FF maps to a single byte with the same value; anything outside that range is not representable and will throw an EncodingException (unless you handle/allow substitution).
+//  * In the mojibake fix, this yields a byte-for-byte buffer (0–255) corresponding to the displayed characters, which you then reinterpret as UTF‑8.
 string fixUtf8MojibakeFromLatin1(string mojibake) {
     // 1) Map displayed Unicode code points (U+0000..U+00FF) back to their byte values.
     Latin1String originalLatin1Bytes;
