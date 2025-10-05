@@ -5,10 +5,25 @@ import std.net.curl; // simple HTTP client in Phobos
 import std.string;
 import std.exception;
 import std.stdio;
+import std.conv;
 
 import llm.chat_context;
 import llm.message;
 
+import std.stdio;
+import std.encoding; // transcode
+import std.utf;       // validate
+
+// Fix UTF-8 text that was mis-decoded as Windows-1252/Latin-1.
+string fixUtf8MojibakeFromLatin1(string mojibake) {
+    // 1) Map displayed Unicode code points (U+0000..U+00FF) back to their byte values.
+    Latin1String originalLatin1Bytes;
+    transcode(mojibake, originalLatin1Bytes);
+    // 2) Interpret those bytes as UTF-8 to recover the real text.
+    auto fixed = cast(string) originalLatin1Bytes.idup;
+    validate(fixed); // optional sanity check
+    return fixed;
+}
 /**
  * Minimal LLM client for chat-like completions.
  * Note: Endpoint and schema tailored for OpenAI-compatible APIs.
@@ -68,7 +83,10 @@ void logRateLimitHeaders(string[string] headers, const string[] keys, string lab
     }
     if (allPresent)
     {
-        writefln("%s remaining %s from limit %s will reset in  %s.", label, headers[keys[1]], headers[keys[0]], headers[keys[2]]);
+        writefln("%s remaining %s from limit %s will reset in  %s.", label, 
+            headers[keys[1]], 
+            headers[keys[0]], 
+            headers[keys[2]]);
     }
 }
 
@@ -77,7 +95,7 @@ class LLMClient
     private string _baseUrl;
     private string _model;
 
-    this(string baseUrl = "https://api.groq.com/openai/v1/", string model = ModelIds.llama_3_1_8b_instant)
+    this(string baseUrl = "https://api.groq.com/openai/v1/", string model = ModelIds.deepseek_r1_distill_llama_70b)
     {
         _baseUrl = baseUrl.stripRight("/");
         _model = model;
@@ -107,20 +125,28 @@ class LLMClient
         auto http = HTTP();
         http.addRequestHeader("Authorization", "Bearer " ~ ctx.apiKey);
         http.addRequestHeader("Content-Type", "application/json");
+        http.addRequestHeader("Accept", "application/json");
+        http.addRequestHeader("Accept-Charset", "UTF-8");
+
+        import std.json;
+        writeln("LLMClient >> Requesting: ", url, " with payload: ", payload.toPrettyString);
         auto response = post(url, payload.toString, http);
+       
+        writeln("Response: ", response);
 
-        // Log reply headers
-        // writeln("Response Headers:");
-        // foreach (key, value; http.responseHeaders)
-        // {
-        //     writeln(key, ": ", value);
-        // }
+        //Log reply headers
+        writeln("Response Headers:");
+        foreach (key, value; http.responseHeaders)
+        {
+            writeln(key, ": ", value);
+        }
 
-        logRateLimitHeaders(http.responseHeaders, rateLimitRequestKeys, "Requests Limit Per Day");
-        logRateLimitHeaders(http.responseHeaders, rateLimitTokenKeys, "Tokens Limit Per Minute");
+        logRateLimitHeaders(http.responseHeaders, rateLimitRequestKeys, "LLMClient >> Requests Limit Per Day");
+        logRateLimitHeaders(http.responseHeaders, rateLimitTokenKeys, "LLMClient >> Tokens Limit Per Minute");
         
         // Parse response and extract first message
         auto json = parseJSON(response);
+         writeln("LLMClient >> Response: ", json.toPrettyString);
         const bool hasChoicesKey = json.type == JSONType.object && ("choices" in json.object) !is null;
         const bool choicesIsArray = hasChoicesKey && json["choices"].type == JSONType.array;
         const bool hasAtLeastOne = choicesIsArray && json["choices"].array.length > 0;
@@ -128,6 +154,7 @@ class LLMClient
         {
             auto first = json["choices"].array[0];
             auto content = first["message"]["content"].str;
+            content = fixUtf8MojibakeFromLatin1(content);
             return content;
         }
         return response.dup; 
