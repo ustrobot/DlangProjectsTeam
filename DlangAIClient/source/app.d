@@ -20,7 +20,7 @@ void main()
 
 	auto ctx = new ChatContext(apiKey);
 	ctx.addMessage(ChatMessage("system", "You are a concise assistant."));
-	ctx.addMessage(ChatMessage("user", format("Say a short greeting to %s.", user.fullName)));
+	ctx.addMessage(ChatMessage("user", format("Say a short exciting greeting to %s.", user.fullName)));
 
 	auto client = new LLMClient();
 	auto reply = client.chatCompletion(ctx);

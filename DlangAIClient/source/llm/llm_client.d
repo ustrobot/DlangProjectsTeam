@@ -41,12 +41,43 @@ public struct ModelIds
     enum string whisper_large_v3_turbo = "whisper-large-v3-turbo";
 }
 
+// Log Requests Limit Per Day headers only if all three keys are present
+const string[] rateLimitRequestKeys = [
+    "x-ratelimit-limit-requests",
+    "x-ratelimit-remaining-requests",
+    "x-ratelimit-reset-requests"
+];
+
+// Log Tokens Limit Per Minute headers only if all three keys are present
+const string[] rateLimitTokenKeys = [
+    "x-ratelimit-limit-tokens",
+    "x-ratelimit-remaining-tokens",
+    "x-ratelimit-reset-tokens"
+];
+
+void logRateLimitHeaders(string[string] headers, const string[] keys, string label)
+{
+    bool allPresent = true;
+    foreach (key; keys)
+    {
+        if ((key in headers) is null)
+        {
+            allPresent = false;
+            break;
+        }
+    }
+    if (allPresent)
+    {
+        writefln("%s remaining %s from limit %s will reset in  %s.", label, headers[keys[1]], headers[keys[0]], headers[keys[2]]);
+    }
+}
+
 class LLMClient
 {
     private string _baseUrl;
     private string _model;
 
-    this(string baseUrl = "https://api.groq.com/openai/v1/", string model = ModelIds.llama_3_3_70b_versatile)
+    this(string baseUrl = "https://api.groq.com/openai/v1/", string model = ModelIds.llama_3_1_8b_instant)
     {
         _baseUrl = baseUrl.stripRight("/");
         _model = model;
@@ -61,8 +92,6 @@ class LLMClient
         payload["model"] = _model;
 
         JSONValue messagesJson = JSONValue.emptyArray;
-        writeln("messagesJson:",messagesJson);
-        stdout.flush;
         foreach (msg; ctx.messages)
         {
             JSONValue m;
@@ -80,6 +109,16 @@ class LLMClient
         http.addRequestHeader("Content-Type", "application/json");
         auto response = post(url, payload.toString, http);
 
+        // Log reply headers
+        // writeln("Response Headers:");
+        // foreach (key, value; http.responseHeaders)
+        // {
+        //     writeln(key, ": ", value);
+        // }
+
+        logRateLimitHeaders(http.responseHeaders, rateLimitRequestKeys, "Requests Limit Per Day");
+        logRateLimitHeaders(http.responseHeaders, rateLimitTokenKeys, "Tokens Limit Per Minute");
+        
         // Parse response and extract first message
         auto json = parseJSON(response);
         const bool hasChoicesKey = json.type == JSONType.object && ("choices" in json.object) !is null;
