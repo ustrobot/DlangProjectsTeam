@@ -37,6 +37,7 @@ extern (C) int UIAppMain(string[] args)
 	chatText.readOnly = true;
 	chatText.focusable = false;
 	chatText.wordWrap = true;
+	chatText.hscrollbarMode = ScrollBarMode.Invisible;
 	chatText.layoutWidth = FILL_PARENT;
 	chatText.layoutHeight = FILL_PARENT;
 	root.addChild(chatText);
