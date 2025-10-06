@@ -22,6 +22,7 @@ class ChatWindow
     private Button _sendBtn;
     private Button _clearBtn;
     private Button _settingsBtn;
+    private TextWidget _modelLabel;
     private ChatContext _chatContext;
     private LLMClient _client;
 
@@ -37,17 +38,6 @@ class ChatWindow
         root.layoutHeight = FILL_PARENT;
         _window.mainWidget = root;
 
-        // Top bar with Settings button
-        auto topBar = new HorizontalLayout();
-        topBar.layoutWidth = FILL_PARENT;
-        topBar.layoutHeight = WRAP_CONTENT;
-        root.addChild(topBar);
-
-        _settingsBtn = new Button();
-        _settingsBtn.text = "Settings";
-        _settingsBtn.layoutWidth = WRAP_CONTENT;
-        _settingsBtn.layoutHeight = WRAP_CONTENT;
-        topBar.addChild(_settingsBtn);
 
         _chatText = new EditBox("");
         _chatText.readOnly = true;
@@ -79,7 +69,25 @@ class ChatWindow
         _clearBtn.layoutWidth = WRAP_CONTENT;
         _clearBtn.layoutHeight = WRAP_CONTENT;
         inputRow.addChild(_clearBtn);
-        
+
+        // Bottom bar with model name and settings button
+        auto bottomBar = new HorizontalLayout();
+        bottomBar.layoutWidth = FILL_PARENT;
+        bottomBar.layoutHeight = WRAP_CONTENT;
+        root.addChild(bottomBar);
+
+        // Model name label (left side)
+        _modelLabel = new TextWidget("", to!dstring("Model: " ~ _client.model));
+        _modelLabel.layoutWidth = FILL_PARENT;
+        _modelLabel.layoutHeight = WRAP_CONTENT;
+        bottomBar.addChild(_modelLabel);
+
+        // Settings button (right side)
+        _settingsBtn = new Button();
+        _settingsBtn.text = "Settings";
+        _settingsBtn.layoutWidth = WRAP_CONTENT;
+        _settingsBtn.layoutHeight = WRAP_CONTENT;
+        bottomBar.addChild(_settingsBtn);
 
         // Wire events
         _sendBtn.click = &onSendClicked;
@@ -149,7 +157,10 @@ class ChatWindow
 
     private void showSettingsDialog()
     {
-        auto settingsDialog = new SettingsDialog(_chatContext, _client, _window);
+        auto settingsDialog = new SettingsDialog(_chatContext, _client, _window, delegate ()
+        {
+            _modelLabel.text = to!dstring("Model: " ~ _client.model);
+        });
         settingsDialog.show();
     }
 

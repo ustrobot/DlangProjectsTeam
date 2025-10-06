@@ -19,6 +19,7 @@ class SettingsDialog
     private EditBox _systemBox;
     private ChatContext _chatContext;
     private LLMClient _client;
+    private void delegate() _onModelChanged;
 
     // Constants for settings dialog
     private enum {
@@ -28,10 +29,11 @@ class SettingsDialog
         BUTTON_ROW_HEIGHT = 40
     }
 
-    this(ChatContext chatContext, LLMClient client, Window parentWindow)
+    this(ChatContext chatContext, LLMClient client, Window parentWindow, void delegate() onModelChanged = null)
     {
         _chatContext = chatContext;
         _client = client;
+        _onModelChanged = onModelChanged;
         
         _dialog = new Dialog(UIString.fromRaw("Settings"d), parentWindow);
         setupDialogContent();
@@ -141,10 +143,18 @@ class SettingsDialog
     {
         // Apply selected model
         UIString selectedModel = _modelCombo.items[_modelCombo.selectedItemIndex];
-        _client.model = to!string(selectedModel.value);
+        string newModel = to!string(selectedModel.value);
+        bool modelChanged = (_client.model != newModel);
+        _client.model = newModel;
         
         // Apply system message
         _chatContext.systemMessage = to!string(_systemBox.text);
+        
+        // Notify if model changed
+        if (modelChanged && _onModelChanged !is null)
+        {
+            _onModelChanged();
+        }
         
         _dialog.close(null);
         return true;
