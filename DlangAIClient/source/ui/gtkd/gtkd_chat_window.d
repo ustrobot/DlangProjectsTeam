@@ -1,0 +1,227 @@
+module ui.gtkd.gtkd_chat_window;
+
+import std.stdio;
+import std.conv : to;
+import std.string;
+
+import gtk.MainWindow;
+import gtk.Main;
+import gtk.Widget;
+import gtk.Box;
+import gtk.Button;
+import gtk.Entry;
+import gtk.TextView;
+import gtk.TextBuffer;
+import gtk.TextIter;
+import gtk.ScrolledWindow;
+import gtk.Label;
+import gdk.Event;
+import gdk.Keysyms;
+
+import llm.chat_context;
+import llm.llm_client;
+import llm.message;
+import ui.chat_ui;
+import ui.gtkd.gtkd_settings_dialog;
+
+/**
+ * GTK-D implementation of the chat window.
+ * Uses GTK+ widgets for the user interface.
+ */
+class GtkDChatWindow : IChatUI
+{
+    private MainWindow _window;
+    private TextView _chatView;
+    private TextBuffer _chatBuffer;
+    private Entry _promptEntry;
+    private Button _sendBtn;
+    private Button _clearBtn;
+    private Button _settingsBtn;
+    private Label _modelLabel;
+    private ChatContext _chatContext;
+    private LLMClient _client;
+    private bool _initialized = false;
+
+    this(ChatContext chatContext, LLMClient client)
+    {
+        _chatContext = chatContext;
+        _client = client;
+
+        // Initialize GTK if not already done
+        if (!_initialized)
+        {
+            string[] args;
+            Main.init(args);
+            _initialized = true;
+        }
+
+        createWindow();
+    }
+
+    private void createWindow()
+    {
+        _window = new MainWindow("Dlang AI Client");
+        _window.setDefaultSize(1200, 900);
+        _window.addOnDelete(&onWindowDelete);
+
+        // Main vertical box
+        auto mainBox = new Box(GtkOrientation.VERTICAL, 5);
+        mainBox.setMarginTop(5);
+        mainBox.setMarginBottom(5);
+        mainBox.setMarginStart(5);
+        mainBox.setMarginEnd(5);
+
+        // Chat display area (scrolled)
+        auto scrolledWindow = new ScrolledWindow();
+        scrolledWindow.setVexpand(true);
+        import gtk.TextTagTable;
+        _chatBuffer = new TextBuffer(cast(TextTagTable)null);
+        _chatView = new TextView(_chatBuffer);
+        _chatView.setEditable(false);
+        _chatView.setWrapMode(GtkWrapMode.WORD);
+        scrolledWindow.add(_chatView);
+        mainBox.packStart(scrolledWindow, true, true, 0);
+
+        // Input row
+        auto inputBox = new Box(GtkOrientation.HORIZONTAL, 5);
+        _promptEntry = new Entry();
+        _promptEntry.setHexpand(true);
+        _promptEntry.addOnActivate(&onSendActivated);
+        inputBox.packStart(_promptEntry, true, true, 0);
+
+        _sendBtn = new Button("Send");
+        _sendBtn.addOnClicked(&onSendClicked);
+        inputBox.packStart(_sendBtn, false, false, 0);
+
+        _clearBtn = new Button("Clear");
+        _clearBtn.addOnClicked(&onClearClicked);
+        inputBox.packStart(_clearBtn, false, false, 0);
+
+        mainBox.packStart(inputBox, false, false, 0);
+
+        // Bottom bar with model label and settings button
+        auto bottomBox = new Box(GtkOrientation.HORIZONTAL, 5);
+        _modelLabel = new Label("Model: " ~ _client.model);
+        _modelLabel.setHexpand(true);
+        _modelLabel.setXalign(0.0); // Left align
+        bottomBox.packStart(_modelLabel, true, true, 0);
+
+        _settingsBtn = new Button("Settings");
+        _settingsBtn.addOnClicked(&onSettingsClicked);
+        bottomBox.packStart(_settingsBtn, false, false, 0);
+
+        mainBox.packStart(bottomBox, false, false, 0);
+
+        _window.add(mainBox);
+    }
+
+    void show()
+    {
+        _window.showAll();
+    }
+
+    int run()
+    {
+        Main.run();
+        return 0;
+    }
+
+    void appendUserMessage(string text)
+    {
+        appendToChat("You: " ~ text);
+    }
+
+    void appendAssistantMessage(string text)
+    {
+        appendToChat("Assistant: " ~ text);
+    }
+
+    void clearChat()
+    {
+        _chatBuffer.setText("");
+        _chatContext.clear();
+    }
+
+    void updateModelLabel(string model)
+    {
+        _modelLabel.setText("Model: " ~ model);
+    }
+
+    private void appendToChat(string text)
+    {
+        TextIter iter;
+        _chatBuffer.getEndIter(iter);
+        
+        // Add newline if buffer is not empty
+        if (_chatBuffer.getCharCount() > 0)
+        {
+            _chatBuffer.insert(iter, "\n");
+            _chatBuffer.getEndIter(iter);
+        }
+        
+        _chatBuffer.insert(iter, text);
+        
+        // Auto-scroll to bottom
+        _chatBuffer.getEndIter(iter);
+        _chatView.scrollToIter(iter, 0.0, false, 0.0, 0.0);
+    }
+
+    private void onSendActivated(Entry entry)
+    {
+        sendMessage();
+    }
+
+    private void onSendClicked(Button button)
+    {
+        sendMessage();
+    }
+
+    private void sendMessage()
+    {
+        string text = _promptEntry.getText();
+        if (text.strip().length == 0)
+            return;
+
+        appendUserMessage(text);
+        _promptEntry.setText("");
+
+        _chatContext.addMessage(ChatMessage("user", text));
+        if (_chatContext.apiKey.length == 0)
+        {
+            appendAssistantMessage("[Error] GROQ_API_KEY not set");
+            return;
+        }
+
+        try
+        {
+            auto reply = _client.chatCompletion(_chatContext);
+            appendAssistantMessage(reply);
+            _chatContext.addMessage(ChatMessage("assistant", reply));
+        }
+        catch (Exception e)
+        {
+            appendAssistantMessage("[Error] " ~ e.msg);
+        }
+    }
+
+    private void onClearClicked(Button button)
+    {
+        clearChat();
+    }
+
+    private void onSettingsClicked(Button button)
+    {
+        auto settingsDialog = new GtkDSettingsDialog(_chatContext, _client, _window, delegate()
+        {
+            updateModelLabel(_client.model);
+        });
+        settingsDialog.show();
+    }
+
+    private bool onWindowDelete(Event event, Widget widget)
+    {
+        Main.quit();
+        return false;
+    }
+}
+

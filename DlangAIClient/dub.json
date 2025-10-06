@@ -5,9 +5,10 @@
 	"copyright": "Copyright © 2025, grolm",
 	"dependencies": {
 		"dlangui": "~>0.10.8",
-		"vibe-d": "~>0.10.2"
+		"vibe-d": "~>0.10.2",
+		"gtk-d": "~>3.10.0"
 	},
-	"description": "Dlang AI client written using dlangui",
+	"description": "Dlang AI client with multiple UI framework support (dlangui and gtk-d)",
 	"license": "proprietary",
 	"name": "dlang-ai-client"
 }

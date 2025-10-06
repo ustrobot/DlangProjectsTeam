@@ -3,7 +3,7 @@
 	"tasks": [
 		{
 			"type": "dub",
-			"run": true,
+			"run": false,
 			"cwd": "${workspaceFolder}",
 			"compiler": "$current",
 			"archType": "$current",
@@ -13,8 +13,69 @@
 				"$dmd"
 			],
 			"group": "build",
-			"label": "dub: Run dlang-ai-client",
-			"detail": "dub run --compiler=dmd -a=x86_64 -b=debug -c=application"
+			"label": "dub: Build dlang-ai-client",
+			"detail": "dub build --compiler=dmd -a=x86_64 -b=debug -c=application"
+		},
+		{
+			"type": "shell",
+			"command": "${workspaceFolder}/dlang-ai-client",
+			"args": [
+				"--UI=dlangui"
+			],
+			"problemMatcher": [],
+			"label": "Run with DlangUI",
+			"detail": "Run dlang-ai-client with DlangUI framework",
+			"group": {
+				"kind": "test",
+				"isDefault": true
+			},
+			"dependsOn": [
+				"dub: Build dlang-ai-client"
+			],
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "dedicated"
+			}
+		},
+		{
+			"type": "shell",
+			"command": "${workspaceFolder}/dlang-ai-client",
+			"args": [
+				"--UI=gtk-d"
+			],
+			"problemMatcher": [],
+			"label": "Run with GTK-D",
+			"detail": "Run dlang-ai-client with GTK-D framework",
+			"group": "test",
+			"dependsOn": [
+				"dub: Build dlang-ai-client"
+			],
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "dedicated"
+			}
+		},
+		{
+			"type": "shell",
+			"command": "${workspaceFolder}/dlang-ai-client",
+			"args": [],
+			"problemMatcher": [],
+			"label": "Run with Default UI",
+			"detail": "Run dlang-ai-client with default UI framework (DlangUI)",
+			"group": "test",
+			"dependsOn": [
+				"dub: Build dlang-ai-client"
+			],
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "dedicated"
+			}
 		}
 	]
 }

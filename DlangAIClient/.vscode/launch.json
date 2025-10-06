@@ -5,14 +5,70 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug",
+            "name": "Debug with DlangUI",
             "type": "gdb",
             "request": "launch",
             "target": "./dlang-ai-client",
             "cwd": "${workspaceRoot}",
+            "arguments": "--UI=dlangui",
             "env": {
                 "GROQ_API_KEY": "${env:GROQ_API_KEY}"
             },
+            "preLaunchTask": "dub: Build dlang-ai-client",
+            "valuesFormatting": "parseText"
+        },
+        {
+            "name": "Debug with GTK-D",
+            "type": "gdb",
+            "request": "launch",
+            "target": "./dlang-ai-client",
+            "cwd": "${workspaceRoot}",
+            "arguments": "--UI=gtk-d",
+            "env": {
+                "GROQ_API_KEY": "${env:GROQ_API_KEY}"
+            },
+            "preLaunchTask": "dub: Build dlang-ai-client",
+            "valuesFormatting": "parseText"
+        },
+        {
+            "name": "Debug with Default UI",
+            "type": "gdb",
+            "request": "launch",
+            "target": "./dlang-ai-client",
+            "cwd": "${workspaceRoot}",
+            "arguments": "",
+            "env": {
+                "GROQ_API_KEY": "${env:GROQ_API_KEY}"
+            },
+            "preLaunchTask": "dub: Build dlang-ai-client",
+            "valuesFormatting": "parseText"
+        },
+        {
+            "name": "Run DlangUI (No Debug)",
+            "type": "gdb",
+            "request": "launch",
+            "target": "./dlang-ai-client",
+            "cwd": "${workspaceRoot}",
+            "arguments": "--UI=dlangui",
+            "env": {
+                "GROQ_API_KEY": "${env:GROQ_API_KEY}"
+            },
+            "preLaunchTask": "dub: Build dlang-ai-client",
+            "stopAtEntry": false,
+            "valuesFormatting": "parseText"
+        },
+        {
+            "name": "Run GTK-D (No Debug)",
+            "type": "gdb",
+            "request": "launch",
+            "target": "./dlang-ai-client",
+            "cwd": "${workspaceRoot}",
+            "arguments": "--UI=gtk-d",
+            "env": {
+                "GROQ_API_KEY": "${env:GROQ_API_KEY}"
+            },
+            "preLaunchTask": "dub: Build dlang-ai-client",
+            "stopAtEntry": false,
             "valuesFormatting": "parseText"
         }
     ]

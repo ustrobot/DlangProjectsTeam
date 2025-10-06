@@ -13,6 +13,7 @@
 		"during": "0.3.0",
 		"eventcore": "0.9.37",
 		"glx-d": "1.1.0",
+		"gtk-d": "3.10.0",
 		"icontheme": "1.2.3",
 		"inilike": "1.2.3",
 		"isfreedesktop": "0.1.1",
