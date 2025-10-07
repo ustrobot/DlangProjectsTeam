@@ -13,7 +13,7 @@ class X2 : Function
         return x * x;
     }
 
-    override string toString()
+    override string toString() const
     {
         return "y = x^^2";
     }
@@ -26,7 +26,7 @@ class Sin : Function
         return sin(x);
     }
 
-    override string toString()
+    override string toString() const
     {
         return "y = sin(x)";
     }
@@ -39,7 +39,7 @@ class Oscillator : Function
         return sin(1 / x);
     }
 
-    override string toString()
+    override string toString() const
     {
         return "y = sin(1/x)";
     }
@@ -52,7 +52,7 @@ class Tg : Function
         return tan(x);
     }
 
-    override string toString()
+    override string toString() const
     {
         return "y = tg(x)";
     }

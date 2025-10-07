@@ -86,6 +86,32 @@
                 "panel": "shared"
             },
             "problemMatcher": "$dmd"
+        },
+        {
+            "label": "Build test_process_cleanup",
+            "type": "shell",
+            "command": "rdmd",
+            "args": [
+                "--build-only",
+                "--compiler=dmd",
+                "--force",
+                "-g",
+                "-debug",
+                "-I=src",
+                "-of=test_process_cleanup",
+                "test_process_cleanup.d"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "silent",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": "$dmd",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
         }
     ]
 }

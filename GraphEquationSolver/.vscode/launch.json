@@ -56,6 +56,31 @@
                 }
             ],
             "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug test_process_cleanup.d",
+            "type": "gdb",
+            "request": "launch",
+            "target": "${workspaceFolder}/test_process_cleanup",
+            "arguments": "",
+            "cwd": "${workspaceFolder}",
+            "gdbpath": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set D language specifics",
+                    "text": "set language d",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Build test_process_cleanup",
+            "postDebugTask": "",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "openOnSessionStart"
         }
     ]
 }
