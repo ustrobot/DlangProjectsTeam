@@ -292,6 +292,58 @@ private:
         };
 
         sidebarWidget.addChild(addNew);
+
+        Button addPolinom = new Button(null, "Добавить полином"d);
+        addPolinom.click = delegate(Widget source) {
+
+            auto inputHandler = delegate(dstring text) {
+
+                string coeffText = to!string(text);
+                // Split by comma or whitespace and filter out empty strings
+                string[] coeffStrings = coeffText.splitter!(c => c == ',' || c == ' ' || c == '\t')
+                                                .filter!(s => s.length > 0)
+                                                .map!(strip)
+                                                .array;
+
+                double[] coefficients;
+                try
+                {
+                    foreach (coeffStr; coeffStrings)
+                    {
+                        if (coeffStr.length > 0)
+                        {
+                            coefficients ~= to!double(coeffStr);
+                        }
+                    }
+
+                    if (coefficients.length > 0)
+                    {
+                        addPolinomFunction(coefficients);
+                    }
+                    else
+                    {
+                        writeln("No valid coefficients provided");
+                    }
+                }
+                catch (ConvException e)
+                {
+                    writeln("Invalid coefficient format: " ~ coeffText);
+                    writeln("Please enter coefficients as numbers separated by commas or spaces");
+                    writeln("Example: 1, -2, 1  (for y = x² - 2x + 1)");
+                }
+                catch (Exception e)
+                {
+                    writeln("Error creating polynomial: " ~ e.msg);
+                }
+
+            };
+            InputBox input = new InputBox(UIString("Создание нового полинома"d),
+                UIString("Введите коэффициенты (через запятую или пробел):"d), w, "1, -2, 1"d, inputHandler);
+            input.show();
+            return true;
+        };
+
+        sidebarWidget.addChild(addPolinom);
         sidebarWidget.addChild(removeSelectedButton);
         sidebarWidget.addChild(removeAllButton);
 

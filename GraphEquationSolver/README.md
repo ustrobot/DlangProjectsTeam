@@ -92,7 +92,12 @@ When you launch GraphEquationSolver, it will open with several pre-loaded exampl
 
 ### Adding Functions
 
-You can add functions programmatically by modifying `src/app.d`:
+#### Interactive UI (Recommended)
+- **"Добавить"** button: Opens a dialog to input mathematical formulas (e.g., `cos(x)`, `x^^2 + sin(x)`)
+- **"Добавить полином"** button: Opens a dialog to input polynomial coefficients (e.g., `1, -2, 1` for y = x² - 2x + 1)
+
+#### Programmatic API
+You can also add functions programmatically by modifying `src/app.d`:
 
 ```d
 // Add a script function
