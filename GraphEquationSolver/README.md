@@ -58,7 +58,7 @@ A graphical equation solver and function plotter written in D language. This app
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/DlangProjectsTeam/
+git clone https://github.com/ustrobot/DlangProjectsTeam/
 cd DlangProjectsTeam/GraphEquationSolver
 ```
 
