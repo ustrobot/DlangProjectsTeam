@@ -81,6 +81,31 @@
             "postDebugTask": "",
             "console": "integratedTerminal",
             "internalConsoleOptions": "openOnSessionStart"
+        },
+        {
+            "name": "Debug Tests",
+            "type": "gdb",
+            "request": "launch",
+            "target": "${workspaceFolder}/GraphEquationSolver-test-library",
+            "arguments": "",
+            "cwd": "${workspaceFolder}",
+            "gdbpath": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set D language specifics",
+                    "text": "set language d",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Build tests for debug",
+            "postDebugTask": "",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "openOnSessionStart"
         }
     ]
 }
