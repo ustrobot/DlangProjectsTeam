@@ -36,7 +36,7 @@ class PolinomFunctionPanel : FunctionPanel
 
         minWidth = 1;
         layoutHeight = 0;
-        backgroundColor(Color.gold);
+        backgroundColor(Color.dark_gray); // Dark background for polynomial function panel
         _a = p.coefficients().dup;
         for (int i = 0; i < _a.length; i++)
         {
@@ -83,7 +83,7 @@ class ScriptFunctionPanel : FunctionPanel
         super(f);
 
         layoutHeight(FILL_PARENT);
-        backgroundColor(Color.golden_rod);
+        backgroundColor(Color.dark_gray); // Dark background for script function panel
 
         EditLine textWidget = new EditLine();
         textWidget.text(to!dstring(f));

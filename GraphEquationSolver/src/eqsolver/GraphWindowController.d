@@ -21,7 +21,7 @@ class GraphWindowController
         //Function tg = new Tg();
 
         g = new GraphPanel();
-        g.backgroundColor = Color.white;
+        g.backgroundColor = Color.gray; // Dark charcoal background
         //g.addFunction(x2);
         //g.addFunction(os);
         //g.addFunction(tg);
@@ -83,7 +83,7 @@ class GraphWindowController
         TextWidget tw = new TextWidget(functionID);
         tw.text(label);
         tw.styleId("LIST_ITEM");
-        tw.backgroundColor(Color.antique_white);
+        tw.backgroundColor(Color.dark_gray); // Dark gray background for list items
 
         functionListAdapter.add(tw);
 
@@ -178,7 +178,7 @@ private:
         functionListAdapter = new WidgetListAdapter();
 
         list.layoutHeight(FILL_PARENT);
-        list.backgroundColor = Color.bisque;
+        list.backgroundColor = Color.dark_gray; // Dark background for list
         list.selectItem(0);
         list.ownAdapter = functionListAdapter;
 
@@ -233,20 +233,20 @@ private:
 
         VerticalLayout emptyPanel = new VerticalLayout("EMPTY_PANEL");
         emptyPanel.layoutHeight(FILL_PARENT);
-        emptyPanel.backgroundColor(Color.aqua);
-        emptyPanel.addChild(new VSpacer().backgroundColor(Color.corn_silk)
+        emptyPanel.backgroundColor(Color.dark_gray); // Very dark background for empty panel
+        emptyPanel.addChild(new VSpacer().backgroundColor(Color.dark_gray)
                 .layoutHeight(FILL_PARENT));
 
         VerticalLayout functionsPanelContainer = new VerticalLayout();
         functionsPanel = new FrameLayout();
         functionsPanel.layoutHeight(FILL_PARENT);
-        functionsPanel.backgroundColor(Color.chocolate);
+        functionsPanel.backgroundColor(Color.dark_gray); // Medium dark background for functions panel
         functionsPanel.addChild(emptyPanel);
         functionsPanel.showChild("EMPTY_PANEL", Visibility.Invisible, true);
         functionsPanel.minHeight = 20;
 
         functionsPanelContainer.addChild(functionsPanel);
-        functionsPanelContainer.backgroundColor(Color.red);
+        functionsPanelContainer.backgroundColor(Color.dark_gray); // Dark background for functions panel container
         sidebarWidget.addChild(functionsPanelContainer);
 
         Button removeAllButton = new Button(null, "Очистить все"d);

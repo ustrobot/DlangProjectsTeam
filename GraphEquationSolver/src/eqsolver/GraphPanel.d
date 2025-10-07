@@ -86,13 +86,21 @@ private:
 
     enum FunctionColors
     {
-        purple = 0x7E12A5
+        cyan = 0x00FFFF,
+        electric_blue = 0x0066FF,
+        hot_pink = 0xFF0080,
+        lime_green = 0x32CD32,
+        bright_orange = 0xFF6600,
+        purple = 0x9932CC,
+        sky_blue = 0x00BFFF,
+        coral = 0xFF7F50,
+        yellow = 0xFFFF00
     }
 
     static const uint[] funcColors = [
-        FunctionColors.purple, Color.dark_green, Color.dark_red, Color.dark_blue,
-        Color.dark_salmon,
-        Color.orange, Color.magenta, Color.blue, Color.dark_orange
+        FunctionColors.cyan, FunctionColors.electric_blue, FunctionColors.hot_pink,
+        FunctionColors.lime_green, FunctionColors.bright_orange, FunctionColors.purple,
+        FunctionColors.sky_blue, FunctionColors.coral, FunctionColors.yellow
     ];
 
     const RectD fromRect = RectD(GraphConstants.DEFAULT_VIEW_LEFT,
