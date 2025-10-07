@@ -7,6 +7,7 @@ import EqSolver.CoordinateMapper;
 public
 {
     import EqSolver.Polinom;
+    import EqSolver.Exceptions;
 }
 
 class GraphPanel : Widget
@@ -15,14 +16,29 @@ public:
 
     void addFunction(Function f)
     {
+        // Validate input
+        if (f is null)
+        {
+            throw new InvalidParameterException("f", "Function cannot be null");
+        }
+        
         _functions ~= f;
     }
 
     void removeFunction(Function f)
     {
+        // Validate input
+        if (f is null)
+        {
+            throw new InvalidParameterException("f", "Function cannot be null");
+        }
+        
         auto index = _functions.countUntil(f);
-        _functions = remove(_functions, tuple(index, index + 1));
-        invalidate();
+        if (index >= 0)
+        {
+            _functions = remove(_functions, tuple(index, index + 1));
+            invalidate();
+        }
     }
 
     void clearFunctions()
@@ -218,7 +234,17 @@ protected:
         fromLeft = center - k * width / 2;
         fromRight = center + k * width / 2;
 
-        setFrom(fromLeft, fromRight);
+        // Validate new range before applying
+        try
+        {
+            setFrom(fromLeft, fromRight);
+        }
+        catch (InvalidParameterException e)
+        {
+            // Silently ignore zoom that would exceed limits
+            // Could also show a message to the user
+            stderr.writeln("Zoom limit reached: ", e.msg);
+        }
     }
 
     void drawFunctions(DrawBuf buf)
@@ -238,12 +264,30 @@ protected:
 
     void drawFunction(DrawBuf buf, Function f, uint color)
     {
+        // Validate function
+        if (f is null)
+        {
+            return; // Skip null functions
+        }
+        
         int iterationsCount = 0;
 
         PointD fromXm = _mapper.mapPointFrom(PointD(_pos.left, 0));
         PointD toXm = _mapper.mapPointFrom(PointD(_pos.right, 0));
 
-        PointD prev = _mapper.mapPointTo(PointD(fromXm.x, f.eval(fromXm.x)));
+        double startY;
+        try
+        {
+            startY = f.eval(fromXm.x);
+        }
+        catch (EvaluationException e)
+        {
+            // Skip drawing if initial evaluation fails
+            stderr.writeln("Warning: Cannot draw function - ", e.msg);
+            return;
+        }
+        
+        PointD prev = _mapper.mapPointTo(PointD(fromXm.x, startY));
 
         double yp = double.nan;
         double xp = double.nan;
@@ -254,7 +298,17 @@ protected:
             double stepIncrement = abs(k) > 1
                 ? _step / min(GraphConstants.MAX_ADAPTIVE_ITERATIONS, abs(k)) : _step;
 
-            double y = f.eval(x);
+            double y;
+            try
+            {
+                y = f.eval(x);
+            }
+            catch (EvaluationException e)
+            {
+                // Skip this point and continue
+                x += stepIncrement;
+                continue;
+            }
 
             iterationsCount += 1;
 
@@ -370,6 +424,31 @@ protected:
 
     void setFrom(double fromLeft, double fromRight)
     {
+        // Validate range
+        if (fromLeft >= fromRight)
+        {
+            throw new InvalidRangeException(fromLeft, fromRight);
+        }
+        if (isNaN(fromLeft) || isNaN(fromRight))
+        {
+            throw new InvalidParameterException("viewport", "Viewport bounds cannot be NaN");
+        }
+        if (isInfinity(fromLeft) || isInfinity(fromRight))
+        {
+            throw new InvalidParameterException("viewport", "Viewport bounds cannot be infinite");
+        }
+        
+        // Check for extreme zoom levels
+        double range = fromRight - fromLeft;
+        if (range < 1e-10)
+        {
+            throw new InvalidParameterException("viewport", "Viewport range too small (minimum 1e-10)");
+        }
+        if (range > 1e10)
+        {
+            throw new InvalidParameterException("viewport", "Viewport range too large (maximum 1e10)");
+        }
+        
         _fromLeft = fromLeft;
         _fromRight = fromRight;
         _step = (_fromRight - _fromLeft) / _stepNum;

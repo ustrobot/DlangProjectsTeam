@@ -4,6 +4,7 @@ import std;
 public
 {
     import EqSolver.Function;
+    import EqSolver.Exceptions;
 }
 
 class Polinom : Function
@@ -18,17 +19,50 @@ class Polinom : Function
 
     public this(double[] a)
     {
+        // Validate input
+        if (a.length == 0)
+        {
+            throw new InvalidParameterException("a", "Coefficient array cannot be empty");
+        }
+        
+        // Check for NaN or Inf values
+        foreach (i, coeff; a)
+        {
+            if (isNaN(coeff))
+            {
+                throw new InvalidParameterException("a", 
+                    format("Coefficient at index %d is NaN", i));
+            }
+            if (isInfinity(coeff))
+            {
+                throw new InvalidParameterException("a", 
+                    format("Coefficient at index %d is infinite", i));
+            }
+        }
+        
         this._a = a.idup;
     }
 
     public override double eval(double x)
     {
+        // Validate input
+        if (isNaN(x))
+        {
+            throw new EvaluationException("Input x is NaN", x);
+        }
+        
         double res = 0;
         double xp = 1;
         for (int i = 0; i < _a.length; i++)
         {
             res += xp * _a[i];
             xp *= x;
+            
+            // Check for overflow
+            if (isInfinity(res))
+            {
+                throw new EvaluationException("Result overflow (infinite value)", x);
+            }
         }
         return res;
     }
@@ -59,6 +93,16 @@ class Polinom : Function
 
     double[] getRoots(double a, double b)
     {
+        // Validate range
+        if (a >= b)
+        {
+            throw new InvalidRangeException(a, b);
+        }
+        if (isNaN(a) || isNaN(b))
+        {
+            throw new InvalidParameterException("range", "Range bounds cannot be NaN");
+        }
+        
         if (!_roots || _rootsFrom > a || _rootsTo < b)
         {
             double from = min(a, _rootsFrom);
@@ -142,13 +186,48 @@ class Polinom : Function
 
     void setCoefficients(double[] a)
     {
-        _a = a.idup;
-        _roots = null;
+        // Validate input (same as constructor)
+        if (a.length == 0)
+        {
+            throw new InvalidParameterException("a", "Coefficient array cannot be empty");
+        }
+        
+        foreach (i, coeff; a)
+        {
+            if (isNaN(coeff))
+            {
+                throw new InvalidParameterException("a", 
+                    format("Coefficient at index %d is NaN", i));
+            }
+            if (isInfinity(coeff))
+            {
+                throw new InvalidParameterException("a", 
+                    format("Coefficient at index %d is infinite", i));
+            }
+        }
+        
+    	_a = a.idup;
+    	_roots = null;
     }
 
 private:
     public double doBisection(double a, double b, double tol)
     {
+        // Validate inputs
+        if (a >= b)
+        {
+            throw new InvalidRangeException(a, b);
+        }
+        if (isNaN(a) || isNaN(b) || isNaN(tol))
+        {
+            throw new InvalidParameterException("bisection parameters", 
+                "Parameters cannot be NaN");
+        }
+        if (tol < 0)
+        {
+            throw new InvalidParameterException("tol", 
+                "Tolerance must be non-negative");
+        }
 
         //System.out.println("Ищем корни функции " + this + " на интервале (" + a +", "+ b + ")");
 
@@ -192,6 +271,16 @@ private:
 
     double[] solve(double a, double b)
     {
+        // Validate range
+        if (a >= b)
+        {
+            throw new InvalidRangeException(a, b);
+        }
+        if (isNaN(a) || isNaN(b))
+        {
+            throw new InvalidParameterException("range", "Range bounds cannot be NaN");
+        }
+        
         double[] result = [];
 
         if (order() == 0)

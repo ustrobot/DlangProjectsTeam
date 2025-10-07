@@ -3,6 +3,7 @@ import std;
 import dlangui;
 import EqSolver.GraphPanel;
 import EqSolver.FunctionPanel;
+import EqSolver.Exceptions;
 
 class GraphWindowController
 {
@@ -44,7 +45,29 @@ class GraphWindowController
 
     void addScriptFunction(string fs)
     {
-        ScriptFunction scriptFunc = new ScriptFunction(fs);
+        // Validate formula string
+        if (fs.length == 0)
+        {
+            stderr.writeln("Error: Cannot add empty formula");
+            return;
+        }
+        
+        ScriptFunction scriptFunc;
+        try
+        {
+            scriptFunc = new ScriptFunction(fs);
+        }
+        catch (InvalidFormulaException e)
+        {
+            stderr.writeln("Error creating function: ", e.msg);
+            return;
+        }
+        catch (Exception e)
+        {
+            stderr.writeln("Unexpected error creating function: ", e.msg);
+            return;
+        }
+        
         string functionID = to!string(cast(void*) scriptFunc);
 
         functions[functionID] = scriptFunc;
@@ -69,7 +92,29 @@ class GraphWindowController
 
     void addPolinomFunction(double[] a)
     {
-        Polinom polinom = new Polinom(a);
+        // Validate coefficients
+        if (a.length == 0)
+        {
+            stderr.writeln("Error: Cannot create polynomial with empty coefficients");
+            return;
+        }
+        
+        Polinom polinom;
+        try
+        {
+            polinom = new Polinom(a);
+        }
+        catch (InvalidParameterException e)
+        {
+            stderr.writeln("Error creating polynomial: ", e.msg);
+            return;
+        }
+        catch (Exception e)
+        {
+            stderr.writeln("Unexpected error creating polynomial: ", e.msg);
+            return;
+        }
+        
         string functionID = to!string(cast(void*) polinom);
 
         functions[functionID] = polinom;
@@ -132,11 +177,11 @@ private:
         list.selectItem(0);
         list.ownAdapter = functionListAdapter;
 
-        class XXX : OnItemSelectedHandler
+        class ListItemSelectionHandler : OnItemSelectedHandler
         {
-            alias XXXHandler = bool delegate(Widget source, int itemIndex);
+            alias theHandler = bool delegate(Widget source, int itemIndex);
 
-            this(XXXHandler h)
+            this(theHandler h)
             {
                 _h = h;
             }
@@ -148,7 +193,7 @@ private:
 
         private:
 
-            XXXHandler _h;
+            theHandler _h;
         }
 
         auto dd = delegate(Widget source, int itemIndex) {
@@ -177,7 +222,7 @@ private:
             return true;
         };
 
-        list.itemSelected = new XXX(dd);
+        list.itemSelected = new ListItemSelectionHandler(dd);
 
         sidebarWidget.addChild(list);
 
