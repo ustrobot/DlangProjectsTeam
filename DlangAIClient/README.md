@@ -8,6 +8,7 @@ This project serves as an **experiment** for:
 
 - **LLM Integration in D**: Exploring how to integrate LLM APIs (currently Groq) using D's native HTTP libraries
 - **Multi-Framework UI**: Demonstrating D's flexibility by supporting multiple UI toolkits (DlangUI and GTK-D)
+- **Chat Persistence**: Implementing automatic saving and loading of conversation history
 - **Modern D Practices**: Showcasing interface-based design, factory patterns, and clean architecture in D
 - **Cross-Platform Development**: Building applications that work across Linux, Windows, and macOS using D
 
@@ -38,6 +39,17 @@ Sign up at [Groq](https://console.groq.com/) and get your API key.
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `GROQ_API_KEY` | Yes | Your Groq API key for LLM access |
+
+### Data Persistence
+
+The application automatically saves your chat conversations and settings:
+
+- **Location**: `~/.dlang-ai-client/chat_context.json`
+- **Auto-save**: Conversations are saved when you exit the application
+- **Auto-load**: Previous conversations are restored when you restart
+- **Backup**: Create backups of this file if you want to preserve specific conversations
+
+To reset your conversation history, simply delete the `chat_context.json` file in your home directory.
 
 ```bash
 export GROQ_API_KEY="your-api-key-here"
@@ -101,6 +113,7 @@ DlangAIClient/
 │   ├── app.d                    # Main entry point (UIAppMain)
 │   ├── llm/                     # LLM client and chat logic
 │   │   ├── chat_context.d       # Conversation state management
+│   │   ├── chat_persistence.d   # Chat history persistence
 │   │   ├── llm_client.d         # HTTP API client
 │   │   └── message.d            # Message data structures
 │   ├── models/                  # Data models

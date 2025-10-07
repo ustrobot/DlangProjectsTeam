@@ -8,9 +8,8 @@ import std.stdio;
 import std.conv;
 
 import llm.chat_context;
-import llm.message;
+import llm.message : MessageRole;
 
-import std.stdio;
 import std.encoding; // transcode
 import std.utf;       // validate
 
@@ -151,6 +150,16 @@ class LLMClient
         payload["model"] = _model;
 
         JSONValue messagesJson = JSONValue.emptyArray;
+
+        // Add system message if present in ctx
+        if (ctx.systemMessage.length > 0)
+        {
+            JSONValue sysMsg;
+            sysMsg["role"] = MessageRole.SYSTEM;
+            sysMsg["content"] = ctx.systemMessage;
+            messagesJson.array ~= sysMsg;
+        }
+
         foreach (msg; ctx.messages)
         {
             JSONValue m;

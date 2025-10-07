@@ -169,10 +169,11 @@ source/
 - Factory: ~60 lines
 - GTK-D Chat Window: ~210 lines
 - GTK-D Settings Dialog: ~145 lines
+- Chat Persistence: ~185 lines
 - App.d refactor: ~70 lines
 - Documentation: ~250 lines
 
-**Total: ~785 new lines of code**
+**Total: ~970 new lines of code**
 
 ## Benefits
 

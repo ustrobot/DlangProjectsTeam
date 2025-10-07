@@ -17,10 +17,11 @@ import gtk.ScrolledWindow;
 import gtk.Label;
 import gdk.Event;
 import gdk.Keysyms;
+import pango.PgFontDescription;
 
 import llm.chat_context;
 import llm.llm_client;
-import llm.message;
+import llm.message : MessageRole, ChatMessage;
 import ui.chat_ui;
 import ui.gtkd.gtkd_settings_dialog;
 
@@ -42,6 +43,17 @@ class GtkDChatWindow : IChatUI
     private LLMClient _client;
     private bool _initialized = false;
 
+    // Font constants for consistent sizing
+    private static PgFontDescription CHAT_FONT_DESC;
+    private static PgFontDescription UI_FONT_DESC;
+
+    // Static constructor to initialize font descriptions
+    static this()
+    {
+        CHAT_FONT_DESC = PgFontDescription.fromString("Monospace 14");
+        UI_FONT_DESC = PgFontDescription.fromString("Sans 14");
+    }
+
     this(ChatContext chatContext, LLMClient client)
     {
         _chatContext = chatContext;
@@ -56,6 +68,7 @@ class GtkDChatWindow : IChatUI
         }
 
         createWindow();
+        populateChatFromContext();
     }
 
     private void createWindow()
@@ -79,6 +92,9 @@ class GtkDChatWindow : IChatUI
         _chatView = new TextView(_chatBuffer);
         _chatView.setEditable(false);
         _chatView.setWrapMode(GtkWrapMode.WORD);
+
+        // Set font size to be 2 points larger than default
+        _chatView.overrideFont(CHAT_FONT_DESC);
         scrolledWindow.add(_chatView);
         mainBox.packStart(scrolledWindow, true, true, 0);
 
@@ -87,14 +103,26 @@ class GtkDChatWindow : IChatUI
         _promptEntry = new Entry();
         _promptEntry.setHexpand(true);
         _promptEntry.addOnActivate(&onSendActivated);
+
+        // Set font size for input field to match chat view
+        _promptEntry.overrideFont(UI_FONT_DESC);
+
         inputBox.packStart(_promptEntry, true, true, 0);
 
         _sendBtn = new Button("Send");
         _sendBtn.addOnClicked(&onSendClicked);
+
+        // Set font size for send button
+        _sendBtn.overrideFont(UI_FONT_DESC);
+
         inputBox.packStart(_sendBtn, false, false, 0);
 
         _clearBtn = new Button("Clear");
         _clearBtn.addOnClicked(&onClearClicked);
+
+        // Set font size for clear button
+        _clearBtn.overrideFont(UI_FONT_DESC);
+
         inputBox.packStart(_clearBtn, false, false, 0);
 
         mainBox.packStart(inputBox, false, false, 0);
@@ -104,15 +132,44 @@ class GtkDChatWindow : IChatUI
         _modelLabel = new Label("Model: " ~ _client.model);
         _modelLabel.setHexpand(true);
         _modelLabel.setXalign(0.0); // Left align
+
+        // Set font size for model label
+        _modelLabel.overrideFont(UI_FONT_DESC);
+
         bottomBox.packStart(_modelLabel, true, true, 0);
 
         _settingsBtn = new Button("Settings");
         _settingsBtn.addOnClicked(&onSettingsClicked);
+
+        // Set font size for settings button
+        _settingsBtn.overrideFont(UI_FONT_DESC);
+
         bottomBox.packStart(_settingsBtn, false, false, 0);
 
         mainBox.packStart(bottomBox, false, false, 0);
 
         _window.add(mainBox);
+    }
+
+    private void populateChatFromContext()
+    {
+        foreach (message; _chatContext.messages)
+        {
+            string displayText;
+            switch (message.role)
+            {
+                case MessageRole.USER:
+                    displayText = "You: " ~ message.content;
+                    break;
+                case MessageRole.ASSISTANT:
+                    displayText = "Assistant: " ~ message.content;
+                    break;
+                default:
+                    displayText = message.role ~ ": " ~ message.content;
+                    break;
+            }
+            appendToChat(displayText);
+        }
     }
 
     void show()
@@ -185,7 +242,7 @@ class GtkDChatWindow : IChatUI
         appendUserMessage(text);
         _promptEntry.setText("");
 
-        _chatContext.addMessage(ChatMessage("user", text));
+        _chatContext.addMessage(ChatMessage(MessageRole.USER, text));
         if (_chatContext.apiKey.length == 0)
         {
             appendAssistantMessage("[Error] GROQ_API_KEY not set");
@@ -196,7 +253,7 @@ class GtkDChatWindow : IChatUI
         {
             auto reply = _client.chatCompletion(_chatContext);
             appendAssistantMessage(reply);
-            _chatContext.addMessage(ChatMessage("assistant", reply));
+            _chatContext.addMessage(ChatMessage(MessageRole.ASSISTANT, reply));
         }
         catch (Exception e)
         {

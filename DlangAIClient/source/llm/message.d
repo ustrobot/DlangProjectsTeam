@@ -1,12 +1,22 @@
 module llm.message;
 
 /**
+ * Constants for message roles.
+ */
+enum MessageRole
+{
+    SYSTEM = "system",
+    USER = "user",
+    ASSISTANT = "assistant"
+}
+
+/**
  * Represents a single chat message.
  * Valid roles typically include: "system", "user", "assistant".
  */
 struct ChatMessage
 {
-    string role;
+    MessageRole role;
     string content;
 }
 

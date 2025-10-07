@@ -7,6 +7,7 @@ import std.getopt;
 
 import models.user;
 import llm.chat_context;
+import llm.chat_persistence;
 import llm.llm_client;
 import llm.message;
 import ui.ui_factory;
@@ -21,16 +22,22 @@ import ui.chat_ui;
 import dlangui;
 mixin APP_ENTRY_POINT;
 
+// Global persistence manager
+private __gshared ChatPersistence _persistence;
+
 /**
  * DlangUI entry point - this is called by dlangui's platform initialization.
  * We use this as our main entry point and handle both frameworks from here.
  */
 extern (C) int UIAppMain(string[] args)
 {
+    // Initialize persistence manager
+    _persistence = new ChatPersistence();
+
     // Parse command-line arguments
     string uiFramework = "dlangui"; // Default to dlangui
     bool showHelp = false;
-    
+
     try
     {
         auto helpInformation = getopt(
@@ -77,10 +84,21 @@ extern (C) int UIAppMain(string[] args)
     {
         stderr.writeln("GROQ_API_KEY is not set; UI will open but Send will fail.");
     }
-    auto chatContext = new ChatContext(apiKey, "You are a concise assistant.");
+
+    // Load saved chat context or create new one
+    auto chatContext = _persistence.loadContext(apiKey, "You are a concise assistant.");
+    writeln("Loaded chat context with ", chatContext.messages.length, " messages");
 
     // LLM client
     auto client = new LLMClient("https://api.groq.com/openai/v1/", ModelIds.llama_3_1_8b_instant);
+
+    // Set up cleanup to save context on exit
+    scope(exit)
+    {
+        writeln("Saving chat context...");
+        _persistence.saveContext(chatContext);
+        writeln("Chat context saved to ", _persistence.dataDir);
+    }
 
     // Handle framework-specific initialization
     final switch (framework)
@@ -91,13 +109,13 @@ extern (C) int UIAppMain(string[] args)
             IChatUI ui = UIFactory.createChatUI(framework, chatContext, client);
             ui.show();
             return ui.run();
-            
+
         case UIFramework.GtkD:
             // GTK-D needs to run outside of dlangui's Platform
             // We need to clean up dlangui's platform first
             stderr.writeln("Warning: Running GTK-D from dlangui entry point.");
             stderr.writeln("Note: Some dlangui initialization has already occurred.");
-            
+
             // Create and run GTK-D window
             // The GtkD implementation will call gtk.Main.init()
             IChatUI gtkUI = UIFactory.createChatUI(framework, chatContext, client);

@@ -8,7 +8,7 @@ import dlangui;
 
 import llm.chat_context;
 import llm.llm_client;
-import llm.message;
+import llm.message : MessageRole, ChatMessage;
 import ui.chat_ui;
 import ui.dlangui.dlangui_settings_dialog;
 
@@ -93,6 +93,30 @@ class DlangUIChatWindow : IChatUI
         _promptField.keyEvent = &onPromptKeyEvent;
         _clearBtn.click = &onClearClicked;
         _settingsBtn.click = &onSettingsClicked;
+
+        populateChatFromContext();
+    }
+
+        private void populateChatFromContext()
+    {
+        foreach (message; _chatContext.messages)
+        {
+            string displayText;
+            switch (message.role)
+            {
+                case MessageRole.USER:
+                    appendUserMessage("You: " ~ message.content);
+                    break;
+                case MessageRole.ASSISTANT:
+                    appendAssistantMessage("Assistant: " ~ message.content);
+                    break;
+                case MessageRole.SYSTEM:
+                    break;
+                default:
+                    appendUserMessage(message.role ~ ": " ~ message.content);
+                    break;
+            }
+        }
     }
 
     void show()
@@ -140,7 +164,7 @@ class DlangUIChatWindow : IChatUI
         appendUserMessage(text);
         _promptField.text = "";
 
-        _chatContext.addMessage(ChatMessage("user", text));
+        _chatContext.addMessage(ChatMessage(MessageRole.USER, text));
         if (_chatContext.apiKey.length == 0)
         {
             appendAssistantMessage("[Error] GROQ_API_KEY not set");
@@ -149,7 +173,7 @@ class DlangUIChatWindow : IChatUI
 
         auto reply = _client.chatCompletion(_chatContext);
         appendAssistantMessage(reply);
-        _chatContext.addMessage(ChatMessage("assistant", reply));
+        _chatContext.addMessage(ChatMessage(MessageRole.ASSISTANT, reply));
         return true;
     }
 
