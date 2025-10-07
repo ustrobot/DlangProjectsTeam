@@ -1,12 +1,12 @@
-module EqSolver.FunctionPanel;
+module eqsolver.FunctionPanel;
 
 import std;
 import dlangui;
 
 public
 {
-    import EqSolver.Polinom;
-    import EqSolver.ScriptFunction;
+    import eqsolver.Polinom;
+    import eqsolver.ScriptFunction;
 }
 
 class FunctionPanel : VerticalLayout

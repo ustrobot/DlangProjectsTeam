@@ -1,11 +1,11 @@
-module EqSolver.CoordinateMapper;
+module eqsolver.CoordinateMapper;
 
 import std;
 import dlangui;
 
 public
 {
-    import EqSolver.RectD;
+    import eqsolver.RectD;
 }
 
 class CoordinateMapper

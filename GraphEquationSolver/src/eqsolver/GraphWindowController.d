@@ -1,9 +1,9 @@
-module EqSolver.GraphWindowController;
+module eqsolver.GraphWindowController;
 import std;
 import dlangui;
-import EqSolver.GraphPanel;
-import EqSolver.FunctionPanel;
-import EqSolver.Exceptions;
+import eqsolver.GraphPanel;
+import eqsolver.FunctionPanel;
+import eqsolver.Exceptions;
 
 class GraphWindowController
 {
@@ -51,7 +51,7 @@ class GraphWindowController
             stderr.writeln("Error: Cannot add empty formula");
             return;
         }
-        
+
         ScriptFunction scriptFunc;
         try
         {
@@ -67,7 +67,7 @@ class GraphWindowController
             stderr.writeln("Unexpected error creating function: ", e.msg);
             return;
         }
-        
+
         string functionID = to!string(cast(void*) scriptFunc);
 
         functions[functionID] = scriptFunc;
@@ -98,7 +98,7 @@ class GraphWindowController
             stderr.writeln("Error: Cannot create polynomial with empty coefficients");
             return;
         }
-        
+
         Polinom polinom;
         try
         {
@@ -114,7 +114,7 @@ class GraphWindowController
             stderr.writeln("Unexpected error creating polynomial: ", e.msg);
             return;
         }
-        
+
         string functionID = to!string(cast(void*) polinom);
 
         functions[functionID] = polinom;

@@ -1,4 +1,4 @@
-module EqSolver.PointD;
+module eqsolver.PointD;
 import dlangui;
 
 /// 2D point

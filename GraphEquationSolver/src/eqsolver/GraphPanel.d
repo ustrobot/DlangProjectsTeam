@@ -1,13 +1,13 @@
-module EqSolver.GraphPanel;
+module eqsolver.GraphPanel;
 import dlangui;
 import std;
 
-import EqSolver.CoordinateMapper;
+import eqsolver.CoordinateMapper;
 
 public
 {
-    import EqSolver.Polinom;
-    import EqSolver.Exceptions;
+    import eqsolver.Polinom;
+    import eqsolver.Exceptions;
 }
 
 class GraphPanel : Widget
@@ -21,7 +21,7 @@ public:
         {
             throw new InvalidParameterException("f", "Function cannot be null");
         }
-        
+
         _functions ~= f;
     }
 
@@ -32,7 +32,7 @@ public:
         {
             throw new InvalidParameterException("f", "Function cannot be null");
         }
-        
+
         auto index = _functions.countUntil(f);
         if (index >= 0)
         {
@@ -269,7 +269,7 @@ protected:
         {
             return; // Skip null functions
         }
-        
+
         int iterationsCount = 0;
 
         PointD fromXm = _mapper.mapPointFrom(PointD(_pos.left, 0));
@@ -286,7 +286,7 @@ protected:
             stderr.writeln("Warning: Cannot draw function - ", e.msg);
             return;
         }
-        
+
         PointD prev = _mapper.mapPointTo(PointD(fromXm.x, startY));
 
         double yp = double.nan;
@@ -315,7 +315,7 @@ protected:
             PointD p = _mapper.mapPointTo(PointD(x, y));
             buf.drawLineF(prev.getF(), p.getF(), GraphConstants.FUNCTION_LINE_WIDTH, color);
 
-            if (!isNaN(yp))
+            if (!isNaN(yp) && !isNaN(y))
             {
                 if (_pos.isPointInside(prev.getI()) || _pos.isPointInside(p.getI()))
                 {
@@ -437,7 +437,7 @@ protected:
         {
             throw new InvalidParameterException("viewport", "Viewport bounds cannot be infinite");
         }
-        
+
         // Check for extreme zoom levels
         double range = fromRight - fromLeft;
         if (range < 1e-10)
@@ -448,7 +448,7 @@ protected:
         {
             throw new InvalidParameterException("viewport", "Viewport range too large (maximum 1e10)");
         }
-        
+
         _fromLeft = fromLeft;
         _fromRight = fromRight;
         _step = (_fromRight - _fromLeft) / _stepNum;

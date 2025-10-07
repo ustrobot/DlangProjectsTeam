@@ -1,4 +1,4 @@
-module EqSolver.Function;
+module eqsolver.Function;
 import std.math;
 
 interface Function

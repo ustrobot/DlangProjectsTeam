@@ -1,6 +1,6 @@
 import std;
 import dlangui;
-import EqSolver;
+import eqsolver;
 
 mixin APP_ENTRY_POINT;
 

@@ -1,7 +1,7 @@
-module EqSolver.RectD;
+module eqsolver.RectD;
 public
 {
-    import EqSolver.PointD;
+    import eqsolver.PointD;
 }
 
 struct RectD

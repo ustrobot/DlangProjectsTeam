@@ -1,4 +1,4 @@
-module EqSolver.Exceptions;
+module eqsolver.Exceptions;
 
 /**
  * Base exception for GraphEquationSolver errors
@@ -30,6 +30,7 @@ class EvaluationException : GraphEquationSolverException
     this(string msg, double x, string file = __FILE__, size_t line = __LINE__)
     {
         import std.format : format;
+
         super(format("Cannot evaluate at x=%g: %s", x, msg), file, line);
     }
 }
@@ -53,6 +54,7 @@ class InvalidRangeException : GraphEquationSolverException
     this(double from, double to, string file = __FILE__, size_t line = __LINE__)
     {
         import std.format : format;
+
         super(format("Invalid range [%g, %g]: start must be less than end", from, to), file, line);
     }
 }
@@ -67,4 +69,3 @@ class NumericalException : GraphEquationSolverException
         super("Numerical error: " ~ msg, file, line);
     }
 }
-
