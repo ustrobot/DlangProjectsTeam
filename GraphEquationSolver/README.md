@@ -294,7 +294,8 @@ wc.addCustomFunction(new MyFunction());
 
 ## Screenshots
 
-[Add screenshots here showing the application in action]
+![GraphEquationSolver Screenshot](screenshot.png)
+*Main application window showing interactive function plotting with polynomial and trigonometric functions*
 
 ---
 
