@@ -11,13 +11,14 @@ import llm.chat_context;
 import llm.message : MessageRole;
 
 import std.encoding; // transcode
-import std.utf;       // validate
+import std.utf; // validate
 
 // Fix UTF-8 text that was mis-decoded as Windows-1252/Latin-1.
 //  * It decodes the UTF-8 string into Unicode code points, then re-encodes those code points into Latin‑1 bytes, writing them into a Latin1String buffer.
 //  * Practically: each code point in U+0000..U+00FF maps to a single byte with the same value; anything outside that range is not representable and will throw an EncodingException (unless you handle/allow substitution).
 //  * In the mojibake fix, this yields a byte-for-byte buffer (0–255) corresponding to the displayed characters, which you then reinterpret as UTF‑8.
-string fixUtf8MojibakeFromLatin1(string mojibake) {
+string fixUtf8MojibakeFromLatin1(string mojibake)
+{
     // 1) Map displayed Unicode code points (U+0000..U+00FF) back to their byte values.
     Latin1String originalLatin1Bytes;
     transcode(mojibake, originalLatin1Bytes);
@@ -85,9 +86,9 @@ void logRateLimitHeaders(string[string] headers, const string[] keys, string lab
     }
     if (allPresent)
     {
-        writefln("%s remaining %s from limit %s will reset in  %s.", label, 
-            headers[keys[1]], 
-            headers[keys[0]], 
+        writefln("%s remaining %s from limit %s will reset in  %s.", label,
+            headers[keys[1]],
+            headers[keys[0]],
             headers[keys[2]]);
     }
 }
@@ -179,9 +180,10 @@ class LLMClient
         http.addRequestHeader("Accept-Charset", "UTF-8");
 
         import std.json;
+
         writeln("LLMClient >> Requesting: ", url, " with payload: ", payload.toPrettyString);
         auto response = post(url, payload.toString, http);
-       
+
         writeln("Response: ", response);
 
         //Log reply headers
@@ -193,10 +195,10 @@ class LLMClient
 
         logRateLimitHeaders(http.responseHeaders, rateLimitRequestKeys, "LLMClient >> Requests Limit Per Day");
         logRateLimitHeaders(http.responseHeaders, rateLimitTokenKeys, "LLMClient >> Tokens Limit Per Minute");
-        
+
         // Parse response and extract first message
         auto json = parseJSON(response);
-         writeln("LLMClient >> Response: ", json.toPrettyString);
+        writeln("LLMClient >> Response: ", json.toPrettyString);
         const bool hasChoicesKey = json.type == JSONType.object && ("choices" in json.object) !is null;
         const bool choicesIsArray = hasChoicesKey && json["choices"].type == JSONType.array;
         const bool hasAtLeastOne = choicesIsArray && json["choices"].array.length > 0;
@@ -207,8 +209,6 @@ class LLMClient
             content = fixUtf8MojibakeFromLatin1(content);
             return content;
         }
-        return response.dup; 
+        return response.dup;
     }
 }
-
-

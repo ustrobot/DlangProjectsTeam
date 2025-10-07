@@ -88,7 +88,8 @@ class GtkDChatWindow : IChatUI
         auto scrolledWindow = new ScrolledWindow();
         scrolledWindow.setVexpand(true);
         import gtk.TextTagTable;
-        _chatBuffer = new TextBuffer(cast(TextTagTable)null);
+
+        _chatBuffer = new TextBuffer(cast(TextTagTable) null);
         _chatView = new TextView(_chatBuffer);
         _chatView.setEditable(false);
         _chatView.setWrapMode(GtkWrapMode.WORD);
@@ -158,15 +159,15 @@ class GtkDChatWindow : IChatUI
             string displayText;
             switch (message.role)
             {
-                case MessageRole.USER:
-                    displayText = "You: " ~ message.content;
-                    break;
-                case MessageRole.ASSISTANT:
-                    displayText = "Assistant: " ~ message.content;
-                    break;
-                default:
-                    displayText = message.role ~ ": " ~ message.content;
-                    break;
+            case MessageRole.USER:
+                displayText = "You: " ~ message.content;
+                break;
+            case MessageRole.ASSISTANT:
+                displayText = "Assistant: " ~ message.content;
+                break;
+            default:
+                displayText = message.role ~ ": " ~ message.content;
+                break;
             }
             appendToChat(displayText);
         }
@@ -208,16 +209,16 @@ class GtkDChatWindow : IChatUI
     {
         TextIter iter;
         _chatBuffer.getEndIter(iter);
-        
+
         // Add newline if buffer is not empty
         if (_chatBuffer.getCharCount() > 0)
         {
             _chatBuffer.insert(iter, "\n");
             _chatBuffer.getEndIter(iter);
         }
-        
+
         _chatBuffer.insert(iter, text);
-        
+
         // Auto-scroll to bottom
         _chatBuffer.getEndIter(iter);
         _chatView.scrollToIter(iter, 0.0, false, 0.0, 0.0);
@@ -268,8 +269,7 @@ class GtkDChatWindow : IChatUI
 
     private void onSettingsClicked(Button button)
     {
-        auto settingsDialog = new GtkDSettingsDialog(_chatContext, _client, _window, delegate()
-        {
+        auto settingsDialog = new GtkDSettingsDialog(_chatContext, _client, _window, delegate() {
             updateModelLabel(_client.model);
         });
         settingsDialog.show();
@@ -281,4 +281,3 @@ class GtkDChatWindow : IChatUI
         return false;
     }
 }
-

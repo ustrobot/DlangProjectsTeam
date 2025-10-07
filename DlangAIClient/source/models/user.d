@@ -29,6 +29,3 @@ class User
         return _firstName ~ " " ~ _lastName;
     }
 }
-
-
-

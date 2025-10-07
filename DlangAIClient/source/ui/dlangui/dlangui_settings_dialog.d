@@ -169,4 +169,3 @@ class DlangUISettingsDialog : ISettingsDialog
         return true;
     }
 }
-

@@ -25,13 +25,15 @@ class UIFactory
     {
         final switch (framework)
         {
-            case UIFramework.DlangUI:
-                import ui.dlangui.dlangui_chat_window;
-                return new DlangUIChatWindow(chatContext, client);
-            
-            case UIFramework.GtkD:
-                import ui.gtkd.gtkd_chat_window;
-                return new GtkDChatWindow(chatContext, client);
+        case UIFramework.DlangUI:
+            import ui.dlangui.dlangui_chat_window;
+
+            return new DlangUIChatWindow(chatContext, client);
+
+        case UIFramework.GtkD:
+            import ui.gtkd.gtkd_chat_window;
+
+            return new GtkDChatWindow(chatContext, client);
         }
     }
 
@@ -43,20 +45,19 @@ class UIFactory
     {
         import std.uni : toLower;
         import std.string : strip;
-        
+
         string normalized = name.strip().toLower();
-        
+
         switch (normalized)
         {
-            case "dlangui":
-                return UIFramework.DlangUI;
-            case "gtk-d":
-            case "gtkd":
-            case "gtk":
-                return UIFramework.GtkD;
-            default:
-                throw new Exception("Unknown UI framework: " ~ name ~ ". Supported: dlangui, gtk-d");
+        case "dlangui":
+            return UIFramework.DlangUI;
+        case "gtk-d":
+        case "gtkd":
+        case "gtk":
+            return UIFramework.GtkD;
+        default:
+            throw new Exception("Unknown UI framework: " ~ name ~ ". Supported: dlangui, gtk-d");
         }
     }
 }
-

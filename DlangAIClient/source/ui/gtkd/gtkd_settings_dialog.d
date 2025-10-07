@@ -82,7 +82,8 @@ class GtkDSettingsDialog : ISettingsDialog
         auto scrolledWindow = new ScrolledWindow();
         scrolledWindow.setVexpand(true);
         import gtk.TextTagTable;
-        _systemBuffer = new TextBuffer(cast(TextTagTable)null);
+
+        _systemBuffer = new TextBuffer(cast(TextTagTable) null);
         _systemBuffer.setText(_chatContext.systemMessage);
         _systemView = new TextView(_systemBuffer);
         _systemView.setWrapMode(GtkWrapMode.WORD);
@@ -101,7 +102,7 @@ class GtkDSettingsDialog : ISettingsDialog
             _modelCombo.appendText(model);
             if (model == currentModel)
             {
-                selectedIndex = cast(int)i;
+                selectedIndex = cast(int) i;
             }
         }
 
@@ -145,4 +146,3 @@ class GtkDSettingsDialog : ISettingsDialog
         }
     }
 }
-

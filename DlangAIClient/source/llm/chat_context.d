@@ -113,5 +113,3 @@ struct ChatContextData
     ChatMessage[] messages;
     string systemMessage;
 }
-
-

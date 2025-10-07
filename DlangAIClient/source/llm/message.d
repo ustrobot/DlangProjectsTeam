@@ -19,5 +19,3 @@ struct ChatMessage
     MessageRole role;
     string content;
 }
-
-

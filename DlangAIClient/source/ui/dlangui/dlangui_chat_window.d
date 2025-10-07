@@ -97,24 +97,24 @@ class DlangUIChatWindow : IChatUI
         populateChatFromContext();
     }
 
-        private void populateChatFromContext()
+    private void populateChatFromContext()
     {
         foreach (message; _chatContext.messages)
         {
             string displayText;
             switch (message.role)
             {
-                case MessageRole.USER:
-                    appendUserMessage("You: " ~ message.content);
-                    break;
-                case MessageRole.ASSISTANT:
-                    appendAssistantMessage("Assistant: " ~ message.content);
-                    break;
-                case MessageRole.SYSTEM:
-                    break;
-                default:
-                    appendUserMessage(message.role ~ ": " ~ message.content);
-                    break;
+            case MessageRole.USER:
+                appendUserMessage("You: " ~ message.content);
+                break;
+            case MessageRole.ASSISTANT:
+                appendAssistantMessage("Assistant: " ~ message.content);
+                break;
+            case MessageRole.SYSTEM:
+                break;
+            default:
+                appendUserMessage(message.role ~ ": " ~ message.content);
+                break;
             }
         }
     }
@@ -195,8 +195,7 @@ class DlangUIChatWindow : IChatUI
 
     private void showSettingsDialog()
     {
-        auto settingsDialog = new DlangUISettingsDialog(_chatContext, _client, _window, delegate()
-        {
+        auto settingsDialog = new DlangUISettingsDialog(_chatContext, _client, _window, delegate() {
             updateModelLabel(_client.model);
         });
         settingsDialog.show();
@@ -208,4 +207,3 @@ class DlangUIChatWindow : IChatUI
         return true;
     }
 }
-

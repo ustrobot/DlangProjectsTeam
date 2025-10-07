@@ -37,4 +37,3 @@ interface IChatUI
      */
     int run();
 }
-

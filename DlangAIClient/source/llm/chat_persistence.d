@@ -163,7 +163,7 @@ class ChatPersistence
                 {
                     string role = msgJson["role"].str;
                     string content = msgJson["content"].str;
-                    messages ~= ChatMessage(cast(MessageRole)role, content);
+                    messages ~= ChatMessage(cast(MessageRole) role, content);
                 }
             }
 
@@ -182,4 +182,3 @@ class ChatPersistence
         return context;
     }
 }
-
