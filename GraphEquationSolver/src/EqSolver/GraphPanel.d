@@ -34,23 +34,56 @@ public:
     this()
     {
         _mapper = new CoordinateMapper();
-        setFrom(-5, 5);
+        setFrom(GraphConstants.DEFAULT_VIEW_LEFT, GraphConstants.DEFAULT_VIEW_RIGHT);
     }
 
 private:
 
-enum ЦветаДляФункций
-{
-	фиолетовый = 0x7E12A5
-}
+    // Drawing and rendering constants
+    static immutable struct GraphConstants
+    {
+        // Default viewport range
+        static immutable double DEFAULT_VIEW_LEFT = -5.0;
+        static immutable double DEFAULT_VIEW_RIGHT = 5.0;
+        static immutable double DEFAULT_VIEW_TOP = 5.0;
+        static immutable double DEFAULT_VIEW_BOTTOM = -5.0;
+
+        // Rendering parameters
+        static immutable double BASE_STEP = 0.005; // Base step size for function plotting
+        static immutable int STEP_COUNT = 500; // Number of steps for plotting
+        static immutable double FUNCTION_LINE_WIDTH = 2.5; // Width of function curves
+        static immutable double AXIS_LINE_WIDTH = 1.0; // Width of axis lines
+
+        // Root visualization
+        static immutable double ROOT_RADIUS = 1.5; // Radius of root markers
+        static immutable double TOOLTIP_DISTANCE_THRESHOLD = 10.0; // Max distance for tooltip activation
+
+        // Zoom and pan
+        static immutable double ZOOM_FACTOR = 1.1; // Zoom multiplier per wheel step
+        static immutable int MAX_ADAPTIVE_ITERATIONS = 100; // Max iterations for steep functions
+
+        // Grid and axes
+        static immutable double DEFAULT_GRID_STEP_X = 1.0; // Default grid step on X axis
+        static immutable double DEFAULT_GRID_STEP_Y = 1.0; // Default grid step on Y axis
+        static immutable double TICK_MARK_LENGTH = 5.0; // Length of axis tick marks
+    }
+
+    enum FunctionColors
+    {
+        purple = 0x7E12A5
+    }
 
     static const uint[] funcColors = [
-       ЦветаДляФункций.фиолетовый , Color.dark_green, Color.dark_red, Color.dark_blue, Color.dark_salmon,
+        FunctionColors.purple, Color.dark_green, Color.dark_red, Color.dark_blue,
+        Color.dark_salmon,
         Color.orange, Color.magenta, Color.blue, Color.dark_orange
     ];
 
-    const RectD fromRect = RectD(-5, -5, 5, 5);
-    const double step = 0.005;
+    const RectD fromRect = RectD(GraphConstants.DEFAULT_VIEW_LEFT,
+        GraphConstants.DEFAULT_VIEW_TOP,
+        GraphConstants.DEFAULT_VIEW_RIGHT,
+        GraphConstants.DEFAULT_VIEW_BOTTOM);
+    const double step = GraphConstants.BASE_STEP;
 
     CoordinateMapper _mapper;
     Function[] _functions;
@@ -60,9 +93,9 @@ enum ЦветаДляФункций
     Point _toOffset;
 
     double _step;
-    int _stepNum = 500;
-    double _stepX = 1;
-    double _stepY = 1;
+    int _stepNum = GraphConstants.STEP_COUNT;
+    double _stepX = GraphConstants.DEFAULT_GRID_STEP_X;
+    double _stepY = GraphConstants.DEFAULT_GRID_STEP_Y;
 
     Point _mouseDownPos;
     Point _mouseDownOffset;
@@ -90,7 +123,7 @@ protected:
         MouseButton eventButton = event.button;
         MouseAction action = event.action;
 
-		//writeln("EVENT ", event);
+        //writeln("EVENT ", event);
         switch (action)
         {
         case MouseAction.ButtonDown:
@@ -141,7 +174,7 @@ protected:
         y = mouseY;
         return res;
     }
-    
+
     void applyTooltip(Point pt)
     {
         for (int i = 0; i < _functions.length; i++)
@@ -156,7 +189,8 @@ protected:
                 {
                     PointD rp = _mapper.mapPointTo(PointD(roots[j], 0));
                     //writefln("(%f,%f) (%f,%f)", pt.x, pt.y, rp.x, rp.y);
-                    if (sqrt((pt.x - rp.x) ^^ 2 + (pt.y - rp.y) ^^ 2) < 10)
+                    if (sqrt((pt.x - rp.x) ^^ 2 + (
+                            pt.y - rp.y) ^^ 2) < GraphConstants.TOOLTIP_DISTANCE_THRESHOLD)
                     {
                         dstring t = format("%.12g"d, roots[j]);
                         //writeln("TOOLTIP:", t);
@@ -179,7 +213,7 @@ protected:
         double center = (fromRight + fromLeft) / 2;
         double width = fromRight - fromLeft;
 
-        double k = delta > 0 ? 1.1 : 1 / 1.1;
+        double k = delta > 0 ? GraphConstants.ZOOM_FACTOR : 1.0 / GraphConstants.ZOOM_FACTOR;
 
         fromLeft = center - k * width / 2;
         fromRight = center + k * width / 2;
@@ -215,16 +249,17 @@ protected:
         double xp = double.nan;
         double k = 1;
 
-        for (double x = fromXm.x + _step; x < toXm.x; x += abs(k) > 1 ? _step / min(100, abs(k))
-                : _step)
+        for (double x = fromXm.x + _step; x < toXm.x;)
         {
-            double cs = abs(k) > 1 ? _step / min(100, abs(k)) : _step;
+            double stepIncrement = abs(k) > 1
+                ? _step / min(GraphConstants.MAX_ADAPTIVE_ITERATIONS, abs(k)) : _step;
+
             double y = f.eval(x);
 
             iterationsCount += 1;
 
             PointD p = _mapper.mapPointTo(PointD(x, y));
-            buf.drawLineF(prev.getF(), p.getF(), 2.5, color);
+            buf.drawLineF(prev.getF(), p.getF(), GraphConstants.FUNCTION_LINE_WIDTH, color);
 
             if (!isNaN(yp))
             {
@@ -241,6 +276,7 @@ protected:
             prev = p;
             yp = y;
             xp = x;
+            x += stepIncrement;
 
             //writefln("f(%f)= %f", x, y);
             //stdout.flush();
@@ -269,24 +305,28 @@ protected:
         PointD toY = _mapper.mapPointTo(toYm);
         toY.y = _pos.top;
 
-        buf.drawLineF(PointF(fromX.x, fromX.y), PointF(toX.x, toX.y), 1, Color.dark_blue);
+        buf.drawLineF(PointF(fromX.x, fromX.y), PointF(toX.x, toX.y), GraphConstants.AXIS_LINE_WIDTH, Color
+                .dark_blue);
 
         fromXm = _mapper.mapPointFrom(fromX);
         toXm = _mapper.mapPointFrom(toX);
         for (double x = floor(fromXm.x / _stepX) * _stepX; x < toXm.x; x += _stepX)
         {
             PointD p = _mapper.mapPointTo(PointD(x, 0));
-            buf.drawLineF(PointF(p.x, p.y), PointF(p.x, p.y - 5), 1, Color.dark_blue);
+            buf.drawLineF(PointF(p.x, p.y), PointF(p.x, p.y - GraphConstants.TICK_MARK_LENGTH),
+                GraphConstants.AXIS_LINE_WIDTH, Color.dark_blue);
         }
 
-        buf.drawLineF(PointF(fromY.x, fromY.y), PointF(toY.x, toY.y), 1, Color.dark_blue);
+        buf.drawLineF(PointF(fromY.x, fromY.y), PointF(toY.x, toY.y), GraphConstants.AXIS_LINE_WIDTH, Color
+                .dark_blue);
 
         fromYm = _mapper.mapPointFrom(fromY);
         toYm = _mapper.mapPointFrom(toY);
         for (double y = floor(fromYm.y / _stepY) * _stepY; y < toYm.y; y += _stepY)
         {
             PointD p = _mapper.mapPointTo(PointD(0, y));
-            buf.drawLineF(PointF(p.x, p.y), PointF(p.x + 5, p.y), 1, Color.dark_blue);
+            buf.drawLineF(PointF(p.x, p.y), PointF(p.x + GraphConstants.TICK_MARK_LENGTH, p.y),
+                GraphConstants.AXIS_LINE_WIDTH, Color.dark_blue);
         }
     }
 
@@ -318,8 +358,8 @@ protected:
     void drawRoot(DrawBuf buf, PointD rp, Color c)
     {
         PointD p = _mapper.mapPointTo(rp);
-        double radius = 1.5;
-        buf.drawEllipseF(p.x - radius, p.y - radius, radius * 2, radius * 2, 1, c, c);
+        double radius = GraphConstants.ROOT_RADIUS;
+        buf.drawEllipseF(p.x - radius, p.y - radius, radius * 2, radius * 2, GraphConstants.AXIS_LINE_WIDTH, c, c);
     }
 
     RectD getFrom()

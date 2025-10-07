@@ -51,11 +51,9 @@ class PolinomFunctionPanel : FunctionPanel
             edit.layoutWidth = 200;
             h.addChild(edit);
 
-            edit.enterKey = ()
-            {
-            	int icopy = i;
-                return delegate(EditWidgetBase editor)
-                {
+            edit.enterKey = () {
+                int icopy = i;
+                return delegate(EditWidgetBase editor) {
                     dstring df = strip(editor.text);
                     double ai = to!double(df);
                     _a[icopy] = ai;
@@ -72,6 +70,7 @@ class PolinomFunctionPanel : FunctionPanel
             addChild(h);
         }
     }
+
 private:
 
     double[] _a;

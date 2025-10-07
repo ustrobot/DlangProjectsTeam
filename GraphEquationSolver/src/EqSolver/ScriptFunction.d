@@ -1,6 +1,5 @@
 module EqSolver.ScriptFunction;
 import std;
-import std;
 import core.sys.posix.fcntl;
 
 public
@@ -33,10 +32,10 @@ public:
     {
         if (!equal(f, _f))
         {
-        	if (_pipes.pid !is null)
-        	{
-	        	kill(_pipes.pid);
-        	}
+            if (_pipes.pid !is null)
+            {
+                kill(_pipes.pid);
+            }
             _f = f.dup();
 
             string writeFormat = "%f";

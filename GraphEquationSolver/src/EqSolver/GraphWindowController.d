@@ -143,7 +143,7 @@ private:
 
             bool onItemSelected(Widget source, int itemIndex)
             {
-               return _h(source, itemIndex);
+                return _h(source, itemIndex);
             }
 
         private:
@@ -176,7 +176,7 @@ private:
 
             return true;
         };
-        
+
         list.itemSelected = new XXX(dd);
 
         sidebarWidget.addChild(list);

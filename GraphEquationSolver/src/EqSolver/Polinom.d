@@ -8,6 +8,14 @@ public
 
 class Polinom : Function
 {
+    // Numerical computation constants
+    enum PolynomialConstants
+    {
+        EPSILON = 1e-15, // Tolerance for root existence check
+        ZERO_THRESHOLD = 1e-300, // Threshold for considering value as zero
+        DEFAULT_TOLERANCE = 0.0 // Default tolerance for bisection
+    }
+
     public this(double[] a)
     {
         this._a = a.idup;
@@ -62,24 +70,34 @@ class Polinom : Function
         }
         return _roots;
     }
-    
+
     static string powerString(int i)
     {
-    	switch(i)
-    	{
-    		case 1: return "";
-    		case 2: return "²";
-    		case 3: return "³";
-    		case 4: return "⁴";
-    		case 5: return "⁵";
-    		case 6: return "⁶";
-    		case 7: return "⁷";
-    		case 8: return "⁸";
-    		case 9: return "⁹";
-    		default: return format("^^%d", i);
-    	}
-    	
-    	return "";
+        switch (i)
+        {
+        case 1:
+            return "";
+        case 2:
+            return "²";
+        case 3:
+            return "³";
+        case 4:
+            return "⁴";
+        case 5:
+            return "⁵";
+        case 6:
+            return "⁶";
+        case 7:
+            return "⁷";
+        case 8:
+            return "⁸";
+        case 9:
+            return "⁹";
+        default:
+            return format("^^%d", i);
+        }
+
+        return "";
     }
 
     override string toString()
@@ -89,22 +107,24 @@ class Polinom : Function
         {
             if (result.length > 0)
             {
-            	if (_a[i] > 0)
-            	{
-	                result ~= " + ";
-            	}else if (_a[i] < 0)
-            	{
-            		result ~= " - ";
-            	}
+                if (_a[i] > 0)
+                {
+                    result ~= " + ";
+                }
+                else if (_a[i] < 0)
+                {
+                    result ~= " - ";
+                }
             }
             if (_a[i] != 0)
             {
-            	if (i==0)
-            	{
-            		result ~= format("%g", _a[i]);
-            	}else if (_a[i] == 1 || _a[i] == -1)
+                if (i == 0)
                 {
-                    result ~= "x"~powerString(i);
+                    result ~= format("%g", _a[i]);
+                }
+                else if (_a[i] == 1 || _a[i] == -1)
+                {
+                    result ~= "x" ~ powerString(i);
                 }
                 else
                 {
@@ -114,16 +134,16 @@ class Polinom : Function
         }
         return "y = " ~ result;
     }
-    
+
     double[] coefficients()
     {
-    	return _a.dup;
+        return _a.dup;
     }
-    
+
     void setCoefficients(double[] a)
     {
-    	_a = a.idup;
-    	_roots = null;
+        _a = a.idup;
+        _roots = null;
     }
 
 private:
@@ -144,7 +164,7 @@ private:
         {
             fa = eval(a);
             fb = eval(b);
-            if (fa * fb > 1e-15)
+            if (fa * fb > PolynomialConstants.EPSILON)
             {
                 return double.nan;
                 //throw new Exception("Нет корня на интервале (" + a + "," + b + ")");
@@ -165,14 +185,14 @@ private:
                 a = c;
             iterations++;
         }
-        while (abs(a - b) / 2 >= tol && abs(fmid) > 0.0);
+        while (abs(a - b) / 2 >= tol && abs(fmid) > PolynomialConstants.DEFAULT_TOLERANCE);
 
         return c;
     }
 
     double[] solve(double a, double b)
     {
-        double[] результат = [];
+        double[] result = [];
 
         if (order() == 0)
         {
@@ -183,40 +203,40 @@ private:
             return [-this._a[0] / this._a[1]];
         }
 
-        Polinom производная = derivate();
+        Polinom derivative = derivate();
 
-        double[] корниПроизводной = производная.solve(a, b);
-        double[] диапазоны = new double[корниПроизводной.length + 2];
-        диапазоны[0] = a;
-        диапазоны[диапазоны.length - 1] = b;
-        for (int i = 0; i < корниПроизводной.length; i++)
+        double[] derivativeRoots = derivative.solve(a, b);
+        double[] ranges = new double[derivativeRoots.length + 2];
+        ranges[0] = a;
+        ranges[ranges.length - 1] = b;
+        for (int i = 0; i < derivativeRoots.length; i++)
         {
-            диапазоны[i + 1] = корниПроизводной[i];
+            ranges[i + 1] = derivativeRoots[i];
         }
 
-        for (int i = 0; i < диапазоны.length - 1; i++)
+        for (int i = 0; i < ranges.length - 1; i++)
         {
-            double val1 = eval(диапазоны[i]);
-            double val2 = eval(диапазоны[i + 1]);
-            if (abs(val1) < 1e-300)
+            double val1 = eval(ranges[i]);
+            double val2 = eval(ranges[i + 1]);
+            if (abs(val1) < PolynomialConstants.ZERO_THRESHOLD)
             {
-                результат ~= диапазоны[i];
+                result ~= ranges[i];
             }
 
-            if (abs(val2) < 1e-300)
+            if (abs(val2) < PolynomialConstants.ZERO_THRESHOLD)
             {
-                результат ~= диапазоны[i + 1];
+                result ~= ranges[i + 1];
             }
 
             if (val1 * val2 < 0)
             {
-                double корень = doBisection(диапазоны[i],
-                        диапазоны[i + 1], 0);
-                результат ~= корень;
+                double root = doBisection(ranges[i],
+                    ranges[i + 1], PolynomialConstants.DEFAULT_TOLERANCE);
+                result ~= root;
             }
         }
 
-        return результат;
+        return result;
     }
 
 private:

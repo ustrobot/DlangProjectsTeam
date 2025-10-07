@@ -12,12 +12,12 @@ extern (C) int UIAppMain(string[] args)
     wc.addScriptFunction("sqrt(x)");
     wc.addPolinomFunction([0, -2, 1, 1, 1, -1]);
     wc.addPolinomFunction([0, 0, 1]);
-    
-//    for(int i=0;i<30;i++)
-//    {
-//    	wc.addScriptFunction(format("x^^((%d+1)/5.0)", i));
-//    }
-    
+
+    //    for(int i=0;i<30;i++)
+    //    {
+    //    	wc.addScriptFunction(format("x^^((%d+1)/5.0)", i));
+    //    }
+
     wc.show();
 
     return Platform.instance.enterMessageLoop();

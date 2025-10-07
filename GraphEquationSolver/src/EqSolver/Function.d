@@ -12,10 +12,10 @@ class X2 : Function
     {
         return x * x;
     }
-    
-    override string toString() 
+
+    override string toString()
     {
-    	return "y = x^^2";
+        return "y = x^^2";
     }
 };
 
@@ -25,10 +25,10 @@ class Sin : Function
     {
         return sin(x);
     }
-    
-    override string toString() 
+
+    override string toString()
     {
-    	return "y = sin(x)";
+        return "y = sin(x)";
     }
 };
 
@@ -36,15 +36,14 @@ class Oscillator : Function
 {
     override double eval(double x)
     {
-        return sin(1/x);
+        return sin(1 / x);
     }
-    
-    override string toString() 
+
+    override string toString()
     {
-    	return "y = sin(1/x)";
+        return "y = sin(1/x)";
     }
 };
-
 
 class Tg : Function
 {
@@ -52,9 +51,9 @@ class Tg : Function
     {
         return tan(x);
     }
-    
-    override string toString() 
+
+    override string toString()
     {
-    	return "y = tg(x)";
+        return "y = tg(x)";
     }
 };
