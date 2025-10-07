@@ -55,6 +55,12 @@ public:
         return _f;
     }
 
+    bool isValid()
+    {
+        return _pipes.pid !is null &&
+            _pipes.stdin.isOpen && _pipes.stdout.isOpen;
+    }
+
     void setFormula(string f)
     {
         // Validate formula

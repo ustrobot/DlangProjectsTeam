@@ -1,6 +1,7 @@
 module eqsolver.GraphWindowController;
 import std;
 import dlangui;
+import dlangui.dialogs.inputbox;
 import eqsolver.GraphPanel;
 import eqsolver.FunctionPanel;
 import eqsolver.Exceptions;
@@ -56,6 +57,7 @@ class GraphWindowController
         try
         {
             scriptFunc = new ScriptFunction(fs);
+            addScriptFunction(scriptFunc);
         }
         catch (InvalidFormulaException e)
         {
@@ -67,14 +69,17 @@ class GraphWindowController
             stderr.writeln("Unexpected error creating function: ", e.msg);
             return;
         }
+    }
 
+    void addScriptFunction(ScriptFunction scriptFunc)
+    {
         string functionID = to!string(cast(void*) scriptFunc);
 
         functions[functionID] = scriptFunc;
 
         g.addFunction(scriptFunc);
 
-        dstring label = to!dstring(fs);
+        dstring label = to!dstring(scriptFunc.toString());
         TextWidget tw = new TextWidget(functionID);
         tw.text(label);
         tw.styleId("LIST_ITEM");
@@ -263,7 +268,28 @@ private:
         };
 
         Button addNew = new Button(null, "Добавить"d);
-        addNew.click = delegate(Widget source) { stdout.flush(); return true; };
+        addNew.click = delegate(Widget source) {
+
+            auto inputHandler = delegate(dstring text) {
+
+                string functionText = to!string(text);
+                ScriptFunction f = new ScriptFunction(functionText);
+
+                if (f.isValid())
+                {
+                    addScriptFunction(functionText);
+                }
+                else
+                {
+                    writeln("Function is not valid:" ~ functionText);
+                }
+
+            };
+            InputBox input = new InputBox(UIString("Создание новой функции"d),
+                UIString("Веедите формулу:"d), w, "x^^2"d, inputHandler);
+            input.show();
+            return true;
+        };
 
         sidebarWidget.addChild(addNew);
         sidebarWidget.addChild(removeSelectedButton);
