@@ -30,6 +30,7 @@ import lesson3.dynamic_allocation;
 import lesson3.memory_safety;
 import lesson3.dynamic_arrays;
 import lesson3.manual_resize;
+import lesson3.nogc_memory;
 
 import lesson4.node_structure;
 import lesson4.linked_list;
@@ -219,9 +220,10 @@ void showLesson3Menu() {
         writeln("  3. Memory Safety Features in D");
         writeln("  4. Working with Dynamic Arrays");
         writeln("  5. Manually Resizing a Dynamic Array");
+        writeln("  6. Memory Management with GC Disabled");
         writeln("  0. Back to Main Menu");
         writeln();
-        write("Enter your choice (0-5): ");
+        write("Enter your choice (0-6): ");
         
         string input = readln().strip();
         
@@ -243,6 +245,9 @@ void showLesson3Menu() {
                     break;
                 case 5:
                     runExample("Manually Resizing a Dynamic Array", &lesson3.manual_resize.runExample);
+                    break;
+                case 6:
+                    runExample("Memory Management with GC Disabled", &lesson3.nogc_memory.runExample);
                     break;
                 case 0:
                     return;
