@@ -34,7 +34,9 @@ import lesson3.nogc_memory;
 
 import lesson4.node_structure;
 import lesson4.linked_list;
+import lesson4.pointer_linked_list;
 import lesson4.list_operations;
+import lesson4.pointer_list_operations;
 import lesson4.stack_implementation;
 import lesson4.memory_tracking;
 
@@ -276,12 +278,14 @@ void showLesson4Menu() {
         writeln("Select an example:");
         writeln("  1. Node Structure for Linked Lists");
         writeln("  2. Linked List Implementation");
-        writeln("  3. List Operations");
-        writeln("  4. Stack Implementation Using Pointers");
-        writeln("  5. Memory Tracking and Leak Detection");
+        writeln("  3. Pointer-Based Linked List Implementation");
+        writeln("  4. List Operations");
+        writeln("  5. Pointer-Based List Operations");
+        writeln("  6. Stack Implementation Using Pointers");
+        writeln("  7. Memory Tracking and Leak Detection");
         writeln("  0. Back to Main Menu");
         writeln();
-        write("Enter your choice (0-5): ");
+        write("Enter your choice (0-7): ");
         
         string input = readln().strip();
         
@@ -296,12 +300,18 @@ void showLesson4Menu() {
                     runExample("Linked List Implementation", &lesson4.linked_list.runExample);
                     break;
                 case 3:
-                    runExample("List Operations", &lesson4.list_operations.runExample);
+                    runExample("Pointer-Based Linked List Implementation", &lesson4.pointer_linked_list.runExample);
                     break;
                 case 4:
-                    runExample("Stack Implementation Using Pointers", &lesson4.stack_implementation.runExample);
+                    runExample("List Operations", &lesson4.list_operations.runExample);
                     break;
                 case 5:
+                    runExample("Pointer-Based List Operations", &lesson4.pointer_list_operations.runExample);
+                    break;
+                case 6:
+                    runExample("Stack Implementation Using Pointers", &lesson4.stack_implementation.runExample);
+                    break;
+                case 7:
                     runExample("Memory Tracking and Leak Detection", &lesson4.memory_tracking.runExample);
                     break;
                 case 0:
