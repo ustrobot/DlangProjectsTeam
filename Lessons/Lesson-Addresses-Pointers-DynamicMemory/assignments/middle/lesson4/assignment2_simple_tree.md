@@ -231,6 +231,30 @@ Submit your D source code file with:
 - All required tree operations implemented
 - A clear visualization of the family tree
 
+## Memory Management Tips
+
+When working with tree structures in D:
+
+**Node Allocation:**
+- **Class-based trees**: Use `new Person(name, age)` - GC-managed heap allocation
+- **Struct-based trees**: Use `malloc(Person.sizeof)` for manual allocation
+- **Recursive structures**: Be careful with deep recursion to avoid stack overflow
+
+**Tree Traversal Memory:**
+- **Depth-first**: Uses stack space proportional to tree depth
+- **Breadth-first**: Uses queue space proportional to tree width
+- **Recursive traversal**: Each recursive call adds a stack frame
+
+**Memory Cleanup:**
+- **Automatic**: GC handles class-based trees when no references exist
+- **Manual**: Must explicitly free all nodes in struct-based trees
+- **Circular references**: Can prevent GC cleanup in complex tree structures
+
+**Performance Considerations:**
+- Trees with many nodes benefit from efficient allocation patterns
+- Consider using object pools for frequently created/destroyed tree nodes
+- Profile memory usage to identify allocation hotspots
+
 ## Grading Criteria
 
 - **Correctness**: Does your code correctly implement all required operations?

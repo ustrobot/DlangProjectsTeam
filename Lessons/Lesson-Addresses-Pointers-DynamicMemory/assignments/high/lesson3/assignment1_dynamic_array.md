@@ -215,6 +215,30 @@ Your implementation will be evaluated based on:
 4. **Efficiency**: Reasonable resizing strategy and performance
 5. **Code Quality**: Clear, well-organized, and documented code
 
+## Memory Management Tips
+
+When implementing custom dynamic arrays in D:
+
+**Manual Memory Allocation:**
+- Use `malloc(T.sizeof * capacity)` to allocate memory for array elements
+- Cast properly: `T* data = cast(T*)malloc(T.sizeof * capacity);`
+- Always check allocation success: `if (data is null) throw new Exception("Allocation failed");`
+
+**Memory Deallocation:**
+- Always call `free(data)` in destructor or dispose method
+- Never access memory after freeing it (use-after-free)
+- Implement proper cleanup in all code paths
+
+**Resizing Strategy:**
+- Choose appropriate growth factors (1.5x or 2x are common)
+- Consider amortized analysis - frequent small allocations vs occasional large ones
+- Minimize copying during resize operations
+
+**Error Handling:**
+- Check bounds in all access methods
+- Handle allocation failures gracefully
+- Validate input parameters
+
 ## Advanced Extensions
 
 If you complete the basic requirements, try these extensions:

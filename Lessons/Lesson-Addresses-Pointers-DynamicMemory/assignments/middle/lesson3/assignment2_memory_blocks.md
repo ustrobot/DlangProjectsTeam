@@ -167,6 +167,25 @@ Submit your D source code file with:
 - All required functionality implemented
 - Output showing the results of your memory operations
 
+## Memory Management Tips
+
+When working with memory blocks in D:
+
+**Allocation:**
+- Use arrays or structs to represent memory blocks: `char[] blocks = new char[numBlocks];`
+- For dynamic allocation, use `malloc` from `core.stdc.stdlib`: `void* ptr = malloc(size);`
+- Always check if allocation succeeded: `if (ptr is null) { /* handle error */ }`
+
+**Deallocation:**
+- For GC-managed memory (arrays, classes), D's garbage collector handles cleanup automatically
+- For manually allocated memory with `malloc`, always call `free(ptr)` when done
+- Use `scope(exit)` or destructors to ensure cleanup happens even if exceptions occur
+
+**Memory Safety:**
+- Never access memory after freeing it (use-after-free bug)
+- Never free the same memory twice (double-free bug)
+- Keep track of allocated memory to avoid leaks
+
 ## Grading Criteria
 
 - **Correctness**: Does your code correctly implement all required functionality?

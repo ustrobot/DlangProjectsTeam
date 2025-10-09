@@ -173,6 +173,30 @@ Submit your D source code file with:
 - All required operations implemented
 - A clear visualization of the chain
 
+## Memory Management Tips
+
+When working with linked chains in D:
+
+**Node Allocation (Class-based):**
+- Use `new Node(value)` to create nodes - automatically allocated on heap
+- Each node is a separate object managed by the garbage collector
+- Memory is freed automatically when no references point to the node
+
+**Node Allocation (Struct-based with pointers):**
+- Use `malloc(Node.sizeof)` to allocate memory manually
+- Cast the result: `Node* node = cast(Node*)malloc(Node.sizeof);`
+- Initialize manually: `node.value = value; node.next = null;`
+
+**Deallocation:**
+- **Classes**: GC handles cleanup automatically when objects are no longer referenced
+- **Manual allocation**: Always call `free(node)` when removing nodes to prevent memory leaks
+- Use destructors or `scope(exit)` to ensure cleanup happens
+
+**Memory Safety:**
+- Never access freed memory (use-after-free)
+- Never free the same node twice (double-free)
+- Keep track of all allocated nodes to avoid leaks
+
 ## Grading Criteria
 
 - **Correctness**: Does your code correctly implement all required operations?

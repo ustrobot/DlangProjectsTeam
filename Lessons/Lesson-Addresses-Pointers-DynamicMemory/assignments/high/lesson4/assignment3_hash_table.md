@@ -457,6 +457,35 @@ Your implementation will be evaluated based on:
 4. **Performance**: Competitive performance with built-in associative arrays
 5. **Code Quality**: Clear, well-organized, and documented code
 
+## Memory Management Tips
+
+When implementing hash tables with custom memory management in D:
+
+**Bucket Array Allocation:**
+- Use `malloc(HashEntry!(K, V).sizeof * capacity)` for bucket arrays
+- Consider alignment: `malloc` typically aligns to pointer size, but verify for your data types
+- Initialize all entries properly to avoid undefined behavior
+
+**Hash Entry Management:**
+- Each entry needs space for key, value, and metadata (occupied/deleted flags)
+- Consider using unions or tagged unions for efficient storage
+- Handle key and value destruction properly if they contain resources
+
+**Resizing Strategy:**
+- Monitor load factor: `current_elements / total_buckets`
+- Choose appropriate resize triggers (typically 0.7-0.8 for expansion, 0.1-0.2 for shrinking)
+- Rehash all entries during resize - this is expensive for large tables
+
+**Memory Safety:**
+- Validate all pointer operations before dereferencing
+- Handle hash collisions properly to avoid infinite loops
+- Ensure proper cleanup of keys and values that may contain references
+
+**Performance Considerations:**
+- Hash table operations should be O(1) average case
+- Poor hash functions can degrade to O(n) performance
+- Monitor memory fragmentation in long-running applications
+
 ## Advanced Extensions
 
 If you complete the basic requirements, try these extensions:

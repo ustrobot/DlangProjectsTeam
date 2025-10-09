@@ -179,6 +179,30 @@ Submit your D source code file with:
 - All required investigations implemented
 - A clear, organized report of your findings
 
+## Memory Management Tips
+
+When investigating memory usage in D:
+
+**Allocation Patterns:**
+- **Stack allocation**: Variables declared in functions are allocated on the stack and automatically freed when the function returns
+- **Heap allocation**: Objects created with `new` are allocated on the heap and managed by the garbage collector
+- **Static allocation**: Global variables and static variables are allocated when the program starts
+
+**Memory Investigation Tools:**
+- Use `.sizeof` to get the size of types: `int.sizeof`, `MyStruct.sizeof`
+- Use `__traits(classInstanceSize, ClassName)` for class sizes
+- Monitor memory usage with `GC.stats()` or profiling tools
+
+**Memory Optimization:**
+- Group related data together in structs to improve cache locality
+- Use smaller data types when possible (e.g., `byte` instead of `int` for small values)
+- Be aware of padding - structs are aligned to word boundaries
+
+**Garbage Collector Awareness:**
+- The GC runs periodically to free unused memory
+- Avoid creating many short-lived objects in performance-critical code
+- Use `@nogc` functions when you need to avoid GC allocations entirely
+
 ## Grading Criteria
 
 - **Thoroughness**: Did you investigate a variety of data types and structures?

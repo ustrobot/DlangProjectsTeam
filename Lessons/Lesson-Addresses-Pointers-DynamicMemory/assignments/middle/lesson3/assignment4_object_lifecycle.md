@@ -222,6 +222,30 @@ Submit your D source code file with:
 - All required scenarios implemented
 - A clear visualization of object lifecycles
 
+## Memory Management Tips
+
+When tracking object lifecycles in D:
+
+**Object Allocation:**
+- **Classes**: Created with `new ClassName()` - allocated on heap, managed by GC
+- **Structs**: Can be stack-allocated or heap-allocated with `new StructName()`
+- **Arrays**: Dynamic arrays grow automatically, fixed arrays need explicit sizing
+
+**Object Lifetime:**
+- **Scope-based**: Objects in functions are destroyed when the function exits
+- **Reference counting**: Objects exist as long as there are references to them
+- **Manual management**: For performance-critical code, manage memory explicitly
+
+**Memory Leaks Prevention:**
+- Use `scope(exit)` to ensure cleanup even if exceptions occur
+- Avoid circular references that prevent GC cleanup
+- Monitor object creation/destruction patterns
+
+**GC Interaction:**
+- The garbage collector runs periodically to free unused objects
+- You can force collection with `GC.collect()` but this is rarely needed
+- Use `@nogc` for functions that must not allocate GC memory
+
 ## Grading Criteria
 
 - **Correctness**: Does your code correctly track object lifecycles?

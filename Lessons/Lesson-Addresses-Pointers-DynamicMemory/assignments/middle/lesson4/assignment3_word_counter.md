@@ -194,6 +194,30 @@ Submit your D source code file with:
 - All required functionality implemented
 - Clear visualizations of the word count results
 
+## Memory Management Tips
+
+When working with word counting and dictionaries in D:
+
+**Associative Array Memory:**
+- D's built-in associative arrays (`string[int]`) are GC-managed
+- They automatically resize as needed and handle memory efficiently
+- Use `clear()` to remove all entries when done
+
+**String Handling:**
+- Strings in D are immutable and reference-counted
+- `string` variables are just references to string data
+- String concatenation creates new strings: `"hello" ~ "world"` allocates new memory
+
+**Text Processing Memory:**
+- Reading large files: use `std.stdio.File` for memory-efficient file reading
+- Tokenization: `std.string.split()` creates new arrays - consider processing line-by-line for large files
+- Use `std.algorithm.filter` and `std.algorithm.map` for memory-efficient transformations
+
+**Performance Optimization:**
+- For very large texts, consider processing in chunks
+- Use `std.container` collections for complex data structures
+- Profile memory usage with `GC.stats()` to identify hotspots
+
 ## Grading Criteria
 
 - **Correctness**: Does your code correctly count and organize words?

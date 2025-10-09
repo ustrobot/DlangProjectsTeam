@@ -254,6 +254,35 @@ Your implementation will be evaluated based on:
 4. **@nogc Compliance**: Proper implementation of @nogc version
 5. **Code Quality**: Clear, well-organized, and documented code
 
+## Memory Management Tips
+
+When implementing memory pool allocators in D:
+
+**Pool Allocation Strategy:**
+- Pre-allocate large blocks of memory and subdivide them
+- Use free-lists to track available slots efficiently
+- Choose block sizes that minimize waste while fitting objects
+
+**Memory Alignment:**
+- Ensure proper alignment for the objects being stored
+- Use `align(T.alignof)` when allocating memory blocks
+- Consider alignment requirements for different data types
+
+**Thread Safety:**
+- Use atomic operations or locks for concurrent access
+- Consider lock-free data structures for high-performance scenarios
+- Be aware of false sharing in multi-threaded environments
+
+**Error Handling:**
+- Always check if allocation requests can be satisfied
+- Handle out-of-memory conditions gracefully
+- Validate input parameters for size and alignment
+
+**Performance Considerations:**
+- Memory pools reduce allocation overhead significantly
+- But may waste memory if objects are freed in random patterns
+- Profile against standard allocation to ensure benefits
+
 ## Advanced Extensions
 
 If you complete the basic requirements, try these extensions:

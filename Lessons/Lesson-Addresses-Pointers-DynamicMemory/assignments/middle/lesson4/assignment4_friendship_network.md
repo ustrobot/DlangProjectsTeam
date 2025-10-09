@@ -253,6 +253,30 @@ Submit your D source code file with:
 - All required network operations implemented
 - A clear visualization of the friendship network
 
+## Memory Management Tips
+
+When working with social network graphs in D:
+
+**Graph Node Allocation:**
+- **Class-based**: `new Person(name, interests)` - GC-managed heap allocation
+- **Struct-based**: `malloc(Person.sizeof)` for manual memory management
+- **Arrays of references**: `Person[] people` creates array of references, not objects
+
+**Graph Edge Management:**
+- **Adjacency lists**: Use arrays or linked lists to store connections
+- **Bidirectional edges**: Ensure both directions are maintained consistently
+- **Edge removal**: Must remove edges from both nodes in undirected graphs
+
+**Memory Patterns in Graphs:**
+- **Sparse graphs**: Most nodes have few connections - use efficient storage
+- **Dense graphs**: Many connections - may benefit from matrix representation
+- **Dynamic graphs**: Nodes and edges added/removed frequently need efficient algorithms
+
+**Garbage Collection Impact:**
+- Graph algorithms may create many temporary objects
+- Consider using `@nogc` for performance-critical graph operations
+- Monitor GC pressure with `GC.stats()` during graph operations
+
 ## Grading Criteria
 
 - **Correctness**: Does your code correctly implement all required operations?

@@ -150,6 +150,20 @@ Submit your D source code file with:
 - All required functionality implemented
 - Output showing the results of your program
 
+## Memory Management Tips
+
+When working with arrays in D:
+
+**Allocation:**
+- Arrays are automatically allocated when declared: `int[] arr = [1, 2, 3];`
+- Dynamic arrays can grow automatically: `arr ~= 4;` adds an element
+- Use `new int[n]` for fixed-size arrays that won't change size
+
+**Deallocation:**
+- D's garbage collector automatically frees array memory when no longer referenced
+- For performance-critical code, arrays are generally GC-managed, so no manual deallocation needed
+- Avoid creating many temporary arrays in loops to prevent GC pressure
+
 ## Grading Criteria
 
 - **Correctness**: Does your code correctly implement all required functionality?
