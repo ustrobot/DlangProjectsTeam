@@ -176,6 +176,9 @@ class GtkDChatWindow : IChatUI
             case MessageRole.ASSISTANT:
                 displayText = "Assistant: " ~ message.content;
                 break;
+            case MessageRole.SYSTEM:
+                // Skip system messages - don't display them
+                continue;
             default:
                 displayText = message.role ~ ": " ~ message.content;
                 break;
