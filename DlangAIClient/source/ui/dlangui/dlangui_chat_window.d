@@ -105,15 +105,15 @@ class DlangUIChatWindow : IChatUI
             switch (message.role)
             {
             case MessageRole.USER:
-                appendUserMessage("You: " ~ message.content);
+                appendUserMessage(message.content);
                 break;
             case MessageRole.ASSISTANT:
-                appendAssistantMessage("Assistant: " ~ message.content);
+                appendAssistantMessage(message.content);
                 break;
             case MessageRole.SYSTEM:
                 break;
             default:
-                appendUserMessage(message.role ~ ": " ~ message.content);
+                appendUserMessage(message.content);
                 break;
             }
         }
