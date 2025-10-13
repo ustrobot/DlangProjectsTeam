@@ -1,1 +1,0 @@
-Lessons on Chapter 2.10 Addresses, Pointers, and Dynamic Memory.md
