@@ -1,0 +1,16 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/lesson-arithmeticoperations
+lesson-arithmeticoperations.so
+lesson-arithmeticoperations.dylib
+lesson-arithmeticoperations.dll
+lesson-arithmeticoperations.a
+lesson-arithmeticoperations.lib
+lesson-arithmeticoperations-test-*
+*.exe
+*.pdb
+*.o
+*.obj
+*.lst
