@@ -6,9 +6,11 @@ An AI chat client written in **D language** to experiment with Large Language Mo
 
 This project serves as an **experiment** for:
 
-- **LLM Integration in D**: Exploring how to integrate LLM APIs (currently Groq) using D's native HTTP libraries
+- **LLM Integration in D**: Exploring how to integrate LLM APIs using D's native HTTP libraries with dynamic server configuration
 - **Multi-Framework UI**: Demonstrating D's flexibility by supporting multiple UI toolkits (DlangUI and GTK-D)
-- **Chat Persistence**: Implementing automatic saving and loading of conversation history
+- **Chat Persistence**: Implementing automatic saving and loading of conversation history with server/model preferences
+- **Server Configuration Management**: Supporting multiple LLM servers through JSON-based configuration presets
+- **Dynamic Model Loading**: Loading available models from servers at runtime instead of hardcoded lists
 - **Modern D Practices**: Showcasing interface-based design, factory patterns, and clean architecture in D
 - **Cross-Platform Development**: Building applications that work across Linux, Windows, and macOS using D
 
@@ -38,7 +40,9 @@ Sign up at [Groq](https://console.groq.com/) and get your API key.
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `GROQ_API_KEY` | Yes | Your Groq API key for LLM access |
+| `GROQ_API_KEY` | No* | Your Groq API key for LLM access |
+
+*API key can be provided via server presets (see below) or environment variable.
 
 ### Data Persistence
 
@@ -51,8 +55,37 @@ The application automatically saves your chat conversations and settings:
 
 To reset your conversation history, simply delete the `chat_context.json` file in your home directory.
 
+### Server Configuration
+
+The application supports multiple LLM servers through configuration presets. Server presets are stored as `.llm-server` JSON files in a `presets/` directory next to the application binary.
+
+#### Server Preset Format
+
+Create `.llm-server` files with the following JSON structure:
+
+```json
+{
+    "name": "My Server",
+    "description": "Description of the server",
+    "server": "https://api.example.com/v1/",
+    "token": "your-api-key-here"
+}
+```
+
+#### Example Preset
+
+An example Groq server preset is included: `groq-server.llm-server`. Copy this file and update the token with your actual API key.
+
+#### Setting Up Your API Key
+
 ```bash
+# Method 1: Environment variable (legacy support)
 export GROQ_API_KEY="your-api-key-here"
+
+# Method 2: Server preset (recommended)
+# 1. Copy groq-server.llm-server to presets/ directory
+# 2. Edit the token field with your actual API key
+# 3. Select "Groq" from the server dropdown in settings
 ```
 
 ### Build & Run
@@ -64,6 +97,10 @@ cd DlangAIClient
 
 # Build
 dub build
+
+# Set up server presets (optional)
+mkdir -p presets/
+cp groq-server.llm-server presets/
 
 # Run with DlangUI (default)
 ./dlang-ai-client
@@ -155,9 +192,11 @@ This project is starting point for experimenting with:
 ### LLM Integration
 - REST API communication
 - JSON serialization/deserialization
-- Streaming responses (potential enhancement)
+- Dynamic server configuration with presets
+- Runtime model loading from servers
 - Context window management
 - Model parameter configuration
+- Server validation and error handling
 
 ## 🌟 Key Technologies
 

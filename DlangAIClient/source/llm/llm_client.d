@@ -32,31 +32,39 @@ string fixUtf8MojibakeFromLatin1(string mojibake)
  * Note: Endpoint and schema tailored for OpenAI-compatible APIs.
  */
 /**
- * Canonical model identifiers supported by the client.
+ * Represents a model available on the server.
  */
-public struct ModelIds
+struct ModelInfo
 {
-    enum string allam_2_7b = "allam-2-7b";
-    enum string deepseek_r1_distill_llama_70b = "deepseek-r1-distill-llama-70b";
-    enum string gemma2_9b_it = "gemma2-9b-it";
-    enum string groq_compound = "groq/compound";
-    enum string groq_compound_mini = "groq/compound-mini";
-    enum string llama_3_1_8b_instant = "llama-3.1-8b-instant";
-    enum string llama_3_3_70b_versatile = "llama-3.3-70b-versatile";
-    enum string meta_llama_llama_4_maverick_17b_128e_instruct = "meta-llama/llama-4-maverick-17b-128e-instruct";
-    enum string meta_llama_llama_4_scout_17b_16e_instruct = "meta-llama/llama-4-scout-17b-16e-instruct";
-    enum string meta_llama_llama_guard_4_12b = "meta-llama/llama-guard-4-12b";
-    enum string meta_llama_llama_prompt_guard_2_22m = "meta-llama/llama-prompt-guard-2-22m";
-    enum string meta_llama_llama_prompt_guard_2_86m = "meta-llama/llama-prompt-guard-2-86m";
-    enum string moonshotai_kimi_k2_instruct = "moonshotai/kimi-k2-instruct";
-    enum string moonshotai_kimi_k2_instruct_0905 = "moonshotai/kimi-k2-instruct-0905";
-    enum string openai_gpt_oss_120b = "openai/gpt-oss-120b";
-    enum string openai_gpt_oss_20b = "openai/gpt-oss-20b";
-    enum string playai_tts = "playai-tts";
-    enum string playai_tts_arabic = "playai-tts-arabic";
-    enum string qwen_qwen3_32b = "qwen/qwen3-32b";
-    enum string whisper_large_v3 = "whisper-large-v3";
-    enum string whisper_large_v3_turbo = "whisper-large-v3-turbo";
+    string id;
+    string name;
+    string description;
+    long contextLength;
+    string modelType; // e.g., "chat", "embedding", "tts"
+
+    static ModelInfo fromJSON(JSONValue json)
+    {
+        ModelInfo model;
+        model.id = json["id"].str;
+        model.name = json["object"].str; // Using object as name for display
+
+        if ("description" in json && json["description"].type != JSONType.null_)
+        {
+            model.description = json["description"].str;
+        }
+
+        if ("context_length" in json)
+        {
+            model.contextLength = json["context_length"].integer;
+        }
+
+        if ("model_type" in json)
+        {
+            model.modelType = json["model_type"].str;
+        }
+
+        return model;
+    }
 }
 
 // Log Requests Limit Per Day headers only if all three keys are present
@@ -97,11 +105,15 @@ class LLMClient
 {
     private string _baseUrl;
     private string _model;
+    private string _apiKey;
+    private ModelInfo[] _currentModelCache; // Cache models for current server only
+    private bool _modelsLoaded = false; // Track if models have been loaded for current server
 
-    this(string baseUrl, string model)
+    this(string baseUrl, string model, string apiKey = "")
     {
         _baseUrl = baseUrl.stripRight("/");
         _model = model;
+        _apiKey = apiKey;
     }
 
     @property string model() const
@@ -114,37 +126,123 @@ class LLMClient
         _model = newModel;
     }
 
-    /// Returns a curated list of supported model identifiers
+    @property string baseUrl() const
+    {
+        return _baseUrl;
+    }
+
+    @property void baseUrl(string newBaseUrl)
+    {
+        if (_baseUrl != newBaseUrl)
+        {
+            // Clear cache when baseUrl changes to avoid using stale cached data
+            clearModelCache();
+            _baseUrl = newBaseUrl;
+        }
+    }
+
+    @property string apiKey() const
+    {
+        return _apiKey;
+    }
+
+    @property void apiKey(string newApiKey)
+    {
+        _apiKey = newApiKey;
+    }
+
+    /**
+     * Load available models from the server.
+     * Returns an array of ModelInfo structs.
+     * Results are cached for the current server only to avoid repeated API calls.
+     */
+    ModelInfo[] getAvailableModels()
+    {
+        // Check cache first
+        if (_modelsLoaded)
+        {
+            writeln("LLMClient >> Using cached models for server: ", _baseUrl);
+            return _currentModelCache;
+        }
+
+        if (_apiKey.length == 0)
+        {
+            writeln("Warning: API key not set, cannot load models");
+            return [];
+        }
+
+        auto url = _baseUrl ~ "/models";
+
+        try
+        {
+            auto http = HTTP();
+            http.addRequestHeader("Authorization", "Bearer " ~ _apiKey);
+            http.addRequestHeader("Content-Type", "application/json");
+
+            writeln("LLMClient >> Loading models from: ", url);
+            http.url = url;
+            auto response = get(url, http);
+
+            writeln("Models response: ", response);
+
+            auto json = parseJSON(response);
+            ModelInfo[] models;
+
+            if (json.type == JSONType.object && "data" in json)
+            {
+                foreach (modelJson; json["data"].array)
+                {
+                    try
+                    {
+                        models ~= ModelInfo.fromJSON(modelJson);
+                    }
+                    catch (Exception e)
+                    {
+                        writeln("Warning: Failed to parse model JSON: ", e.msg);
+                    }
+                }
+            }
+
+            // Cache the results
+            _currentModelCache = models;
+            _modelsLoaded = true;
+            writeln("Loaded and cached ", models.length, " models for server: ", _baseUrl);
+            return models;
+        }
+        catch (Exception e)
+        {
+            writeln("Warning: Failed to load models from server: ", e.msg);
+            // Cache empty array to avoid repeated failed requests
+            _currentModelCache = [];
+            _modelsLoaded = true;
+            return [];
+        }
+    }
+
+    /**
+     * Clear the model cache for the current server.
+     * Useful when you want to force refresh the model list.
+     */
+    void clearModelCache()
+    {
+        _currentModelCache = [];
+        _modelsLoaded = false;
+        writeln("LLMClient >> Model cache cleared for current server: ", _baseUrl);
+    }
+
+    /**
+     * Get model IDs for use in supportedModels() replacement.
+     * @deprecated Use getAvailableModels() instead for dynamic loading.
+     */
     static string[] supportedModels()
     {
-        return [
-            ModelIds.allam_2_7b,
-            ModelIds.deepseek_r1_distill_llama_70b,
-            ModelIds.gemma2_9b_it,
-            ModelIds.groq_compound,
-            ModelIds.groq_compound_mini,
-            ModelIds.llama_3_1_8b_instant,
-            ModelIds.llama_3_3_70b_versatile,
-            ModelIds.meta_llama_llama_4_maverick_17b_128e_instruct,
-            ModelIds.meta_llama_llama_4_scout_17b_16e_instruct,
-            ModelIds.meta_llama_llama_guard_4_12b,
-            ModelIds.meta_llama_llama_prompt_guard_2_22m,
-            ModelIds.meta_llama_llama_prompt_guard_2_86m,
-            ModelIds.moonshotai_kimi_k2_instruct,
-            ModelIds.moonshotai_kimi_k2_instruct_0905,
-            ModelIds.openai_gpt_oss_120b,
-            ModelIds.openai_gpt_oss_20b,
-            ModelIds.playai_tts,
-            ModelIds.playai_tts_arabic,
-            ModelIds.qwen_qwen3_32b,
-            ModelIds.whisper_large_v3,
-            ModelIds.whisper_large_v3_turbo,
-        ];
+        writeln("Warning: supportedModels() is deprecated. Use dynamic model loading instead.");
+        return [];
     }
 
     string chatCompletion(ChatContext ctx)
     {
-        enforce(ctx.apiKey.length > 0, "API key is required");
+        enforce(_apiKey.length > 0, "API key is required");
 
         // Build request JSON
         JSONValue payload;
@@ -174,12 +272,10 @@ class LLMClient
 
         // Perform request
         auto http = HTTP();
-        http.addRequestHeader("Authorization", "Bearer " ~ ctx.apiKey);
+        http.addRequestHeader("Authorization", "Bearer " ~ _apiKey);
         http.addRequestHeader("Content-Type", "application/json");
         http.addRequestHeader("Accept", "application/json");
         http.addRequestHeader("Accept-Charset", "UTF-8");
-
-        import std.json;
 
         writeln("LLMClient >> Requesting: ", url, " with payload: ", payload.toPrettyString);
         auto response = post(url, payload.toString, http);
