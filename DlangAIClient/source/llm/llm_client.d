@@ -106,6 +106,8 @@ class LLMClient
     private string _baseUrl;
     private string _model;
     private string _apiKey;
+    private ModelInfo[] _currentModelCache; // Cache models for current server only
+    private bool _modelsLoaded = false; // Track if models have been loaded for current server
 
     this(string baseUrl, string model, string apiKey = "")
     {
@@ -131,7 +133,12 @@ class LLMClient
 
     @property void baseUrl(string newBaseUrl)
     {
-        _baseUrl = newBaseUrl.stripRight("/");
+        if (_baseUrl != newBaseUrl)
+        {
+            // Clear cache when baseUrl changes to avoid using stale cached data
+            clearModelCache();
+            _baseUrl = newBaseUrl;
+        }
     }
 
     @property string apiKey() const
@@ -147,9 +154,17 @@ class LLMClient
     /**
      * Load available models from the server.
      * Returns an array of ModelInfo structs.
+     * Results are cached for the current server only to avoid repeated API calls.
      */
     ModelInfo[] getAvailableModels()
     {
+        // Check cache first
+        if (_modelsLoaded)
+        {
+            writeln("LLMClient >> Using cached models for server: ", _baseUrl);
+            return _currentModelCache;
+        }
+
         if (_apiKey.length == 0)
         {
             writeln("Warning: API key not set, cannot load models");
@@ -188,14 +203,31 @@ class LLMClient
                 }
             }
 
-            writeln("Loaded ", models.length, " models");
+            // Cache the results
+            _currentModelCache = models;
+            _modelsLoaded = true;
+            writeln("Loaded and cached ", models.length, " models for server: ", _baseUrl);
             return models;
         }
         catch (Exception e)
         {
             writeln("Warning: Failed to load models from server: ", e.msg);
+            // Cache empty array to avoid repeated failed requests
+            _currentModelCache = [];
+            _modelsLoaded = true;
             return [];
         }
+    }
+
+    /**
+     * Clear the model cache for the current server.
+     * Useful when you want to force refresh the model list.
+     */
+    void clearModelCache()
+    {
+        _currentModelCache = [];
+        _modelsLoaded = false;
+        writeln("LLMClient >> Model cache cleared for current server: ", _baseUrl);
     }
 
     /**
