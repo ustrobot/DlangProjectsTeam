@@ -28,3 +28,4 @@ GraphEquationSolver/GraphEquationSolver
 GraphEquationSolver/GraphEquationSolver-test-library
 GraphEquationSolver/GraphEquationSolver-test-unittest
 GraphEquationSolver/test_process_cleanup
+*.llm-server
