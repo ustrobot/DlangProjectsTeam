@@ -1,7 +1,0 @@
-{
-	"name": "GraphEquationSolver",
-	"description": "Hello World - A minimal DUB bundle.",
-	"dependencies": {
-		"dlangui": "*"
-	}
-}
