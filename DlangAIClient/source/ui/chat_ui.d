@@ -32,6 +32,11 @@ interface IChatUI
     void updateModelLabel(string model);
 
     /**
+     * Update the server label with the current server name
+     */
+    void updateServerLabel(string server);
+
+    /**
      * Run the UI message loop
      * Returns exit code
      */

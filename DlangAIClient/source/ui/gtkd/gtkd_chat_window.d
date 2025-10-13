@@ -39,6 +39,7 @@ class GtkDChatWindow : IChatUI
     private Button _clearBtn;
     private Button _settingsBtn;
     private Label _modelLabel;
+    private Label _serverLabel;
     private ChatContext _chatContext;
     private LLMClient _client;
     private bool _initialized = false;
@@ -128,16 +129,26 @@ class GtkDChatWindow : IChatUI
 
         mainBox.packStart(inputBox, false, false, 0);
 
-        // Bottom bar with model label and settings button
+        // Bottom bar with model label, server label, and settings button
         auto bottomBox = new Box(GtkOrientation.HORIZONTAL, 5);
         _modelLabel = new Label("Model: " ~ _client.model);
-        _modelLabel.setHexpand(true);
+        _modelLabel.setHexpand(false);
         _modelLabel.setXalign(0.0); // Left align
 
         // Set font size for model label
         _modelLabel.overrideFont(UI_FONT_DESC);
 
-        bottomBox.packStart(_modelLabel, true, true, 0);
+        bottomBox.packStart(_modelLabel, false, false, 0);
+
+        string serverText = _chatContext.selectedServer.length > 0 ? _chatContext.selectedServer : "Not selected";
+        _serverLabel = new Label(" at " ~ serverText);
+        _serverLabel.setHexpand(true);
+        _serverLabel.setXalign(0.0); // Left align
+
+        // Set font size for server label
+        _serverLabel.overrideFont(UI_FONT_DESC);
+
+        bottomBox.packStart(_serverLabel, true, true, 0);
 
         _settingsBtn = new Button("Settings");
         _settingsBtn.addOnClicked(&onSettingsClicked);
@@ -165,6 +176,9 @@ class GtkDChatWindow : IChatUI
             case MessageRole.ASSISTANT:
                 displayText = "Assistant: " ~ message.content;
                 break;
+            case MessageRole.SYSTEM:
+                // Skip system messages - don't display them
+                continue;
             default:
                 displayText = message.role ~ ": " ~ message.content;
                 break;
@@ -203,6 +217,11 @@ class GtkDChatWindow : IChatUI
     void updateModelLabel(string model)
     {
         _modelLabel.setText("Model: " ~ model);
+    }
+
+    void updateServerLabel(string server)
+    {
+        _serverLabel.setText("Server: " ~ (server.length > 0 ? server : "Not selected"));
     }
 
     private void appendToChat(string text)
@@ -271,6 +290,7 @@ class GtkDChatWindow : IChatUI
     {
         auto settingsDialog = new GtkDSettingsDialog(_chatContext, _client, _window, delegate() {
             updateModelLabel(_client.model);
+            updateServerLabel(_chatContext.selectedServer);
         });
         settingsDialog.show();
     }

@@ -25,6 +25,7 @@ class DlangUIChatWindow : IChatUI
     private Button _clearBtn;
     private Button _settingsBtn;
     private TextWidget _modelLabel;
+    private TextWidget _serverLabel;
     private ChatContext _chatContext;
     private LLMClient _client;
 
@@ -69,7 +70,7 @@ class DlangUIChatWindow : IChatUI
         _clearBtn.layoutHeight = WRAP_CONTENT;
         inputRow.addChild(_clearBtn);
 
-        // Bottom bar with model name and settings button
+        // Bottom bar with model name, server name, and settings button
         auto bottomBar = new HorizontalLayout();
         bottomBar.layoutWidth = FILL_PARENT;
         bottomBar.layoutHeight = WRAP_CONTENT;
@@ -77,9 +78,16 @@ class DlangUIChatWindow : IChatUI
 
         // Model name label (left side)
         _modelLabel = new TextWidget("", to!dstring("Model: " ~ _client.model));
-        _modelLabel.layoutWidth = FILL_PARENT;
+        _modelLabel.layoutWidth = WRAP_CONTENT;
         _modelLabel.layoutHeight = WRAP_CONTENT;
         bottomBar.addChild(_modelLabel);
+
+        // Server name label (center, fills remaining space)
+        string serverText = _chatContext.selectedServer.length > 0 ? _chatContext.selectedServer : "Not selected";
+        _serverLabel = new TextWidget("", to!dstring(" at " ~ serverText));
+        _serverLabel.layoutWidth = FILL_PARENT;
+        _serverLabel.layoutHeight = WRAP_CONTENT;
+        bottomBar.addChild(_serverLabel);
 
         // Settings button (right side)
         _settingsBtn = new Button();
@@ -105,15 +113,15 @@ class DlangUIChatWindow : IChatUI
             switch (message.role)
             {
             case MessageRole.USER:
-                appendUserMessage("You: " ~ message.content);
+                appendUserMessage(message.content);
                 break;
             case MessageRole.ASSISTANT:
-                appendAssistantMessage("Assistant: " ~ message.content);
+                appendAssistantMessage(message.content);
                 break;
             case MessageRole.SYSTEM:
                 break;
             default:
-                appendUserMessage(message.role ~ ": " ~ message.content);
+                appendUserMessage(message.content);
                 break;
             }
         }
@@ -148,6 +156,11 @@ class DlangUIChatWindow : IChatUI
     void updateModelLabel(string model)
     {
         _modelLabel.text = to!dstring("Model: " ~ model);
+    }
+
+    void updateServerLabel(string server)
+    {
+        _serverLabel.text = to!dstring("Server: " ~ (server.length > 0 ? server : "Not selected"));
     }
 
     @property Window window()
@@ -197,6 +210,7 @@ class DlangUIChatWindow : IChatUI
     {
         auto settingsDialog = new DlangUISettingsDialog(_chatContext, _client, _window, delegate() {
             updateModelLabel(_client.model);
+            updateServerLabel(_chatContext.selectedServer);
         });
         settingsDialog.show();
     }

@@ -46,13 +46,13 @@ class ChatPersistence
      * Load chat context from JSON file.
      * Returns null if no saved context exists or loading fails.
      */
-    ChatContext loadContext(string apiKey, string defaultSystemMessage = "You are a concise assistant.")
+    ChatContext loadContext(string apiKey, string defaultSystemMessage = "You are a concise assistant.", string defaultServer = "", string defaultModel = "")
     {
         auto filePath = buildPath(_dataDir, CONTEXT_FILE);
 
         if (!exists(filePath))
         {
-            return new ChatContext(apiKey, defaultSystemMessage);
+            return new ChatContext(apiKey, defaultSystemMessage, defaultServer, defaultModel);
         }
 
         try
@@ -65,7 +65,7 @@ class ChatPersistence
         catch (Exception e)
         {
             stderr.writeln("Warning: Failed to load chat context, using defaults: ", e.msg);
-            return new ChatContext(apiKey, defaultSystemMessage);
+            return new ChatContext(apiKey, defaultSystemMessage, defaultServer, defaultModel);
         }
     }
 
@@ -142,6 +142,10 @@ class ChatPersistence
         // Serialize system message (separate from messages array)
         json["systemMessage"] = context.systemMessage;
 
+        // Serialize selected server and model
+        json["selectedServer"] = context.selectedServer;
+        json["selectedModel"] = context.selectedModel;
+
         return JSONValue(json);
     }
 
@@ -177,6 +181,17 @@ class ChatPersistence
         if ("systemMessage" in jsonData && jsonData["systemMessage"].type == JSONType.string)
         {
             context.systemMessage = jsonData["systemMessage"].str;
+        }
+
+        // Deserialize selected server and model
+        if ("selectedServer" in jsonData && jsonData["selectedServer"].type == JSONType.string)
+        {
+            context.selectedServer = jsonData["selectedServer"].str;
+        }
+
+        if ("selectedModel" in jsonData && jsonData["selectedModel"].type == JSONType.string)
+        {
+            context.selectedModel = jsonData["selectedModel"].str;
         }
 
         return context;

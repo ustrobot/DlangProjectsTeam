@@ -10,11 +10,15 @@ class ChatContext
     private ChatMessage[] _messages;
     private string _apiKey;
     private string _systemMessage;
+    private string _selectedServer;
+    private string _selectedModel;
 
-    this(string apiKey, string systemMessage = "")
+    this(string apiKey, string systemMessage = "", string selectedServer = "", string selectedModel = "")
     {
         _apiKey = apiKey;
         _systemMessage = systemMessage;
+        _selectedServer = selectedServer;
+        _selectedModel = selectedModel;
     }
 
     @property string apiKey() const
@@ -68,6 +72,26 @@ class ChatContext
         }
     }
 
+    @property string selectedServer() const
+    {
+        return _selectedServer;
+    }
+
+    @property void selectedServer(string value)
+    {
+        _selectedServer = value;
+    }
+
+    @property string selectedModel() const
+    {
+        return _selectedModel;
+    }
+
+    @property void selectedModel(string value)
+    {
+        _selectedModel = value;
+    }
+
     /**
      * Get messages array for serialization purposes.
      * Note: This returns a copy to maintain encapsulation.
@@ -91,7 +115,7 @@ class ChatContext
      */
     ChatContextData getSerializableData()
     {
-        return ChatContextData(_messages.dup, _systemMessage);
+        return ChatContextData(_messages.dup, _systemMessage, _selectedServer, _selectedModel);
     }
 
     /**
@@ -101,6 +125,8 @@ class ChatContext
     {
         _apiKey = apiKey;
         _systemMessage = data.systemMessage;
+        _selectedServer = data.selectedServer;
+        _selectedModel = data.selectedModel;
         _messages = data.messages.dup;
     }
 }
@@ -112,4 +138,6 @@ struct ChatContextData
 {
     ChatMessage[] messages;
     string systemMessage;
+    string selectedServer;
+    string selectedModel;
 }

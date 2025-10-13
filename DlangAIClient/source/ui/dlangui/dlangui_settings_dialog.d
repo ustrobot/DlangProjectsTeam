@@ -3,11 +3,13 @@ module ui.dlangui.dlangui_settings_dialog;
 import std.array;
 import std.algorithm;
 import std.conv : to;
+import std.stdio;
 import dlangui;
 import dlangui.dialogs.dialog;
 
 import llm.chat_context;
 import llm.llm_client;
+import llm.server_preset;
 import ui.settings_ui;
 
 /**
@@ -17,10 +19,13 @@ import ui.settings_ui;
 class DlangUISettingsDialog : ISettingsDialog
 {
     private Dialog _dialog;
+    private ComboBox _serverCombo;
     private ComboBox _modelCombo;
     private EditBox _systemBox;
     private ChatContext _chatContext;
     private LLMClient _client;
+    private ServerPresetManager _presetManager;
+    private ModelInfo[] _availableModels;
     private void delegate() _onModelChanged;
 
     // Constants for settings dialog
@@ -38,11 +43,18 @@ class DlangUISettingsDialog : ISettingsDialog
         _client = client;
         _onModelChanged = onModelChanged;
 
+        // Initialize server preset manager
+        _presetManager = new ServerPresetManager();
+
         _dialog = new Dialog(UIString.fromRaw("Settings"d), parentWindow);
         setupDialogContent();
+        setupServerSelector();
         setupModelSelector();
         setupSystemPromptEditor();
         setupDialogButtons();
+
+        populateServerComboBox();
+        populateModelComboBox();
     }
 
     void show()
@@ -59,6 +71,20 @@ class DlangUISettingsDialog : ISettingsDialog
         content.minHeight = 1;
     }
 
+    private void setupServerSelector()
+    {
+        auto content = _dialog;
+
+        // Server label
+        auto serverLabel = new TextWidget("", "Server"d);
+        serverLabel.minHeight = LABEL_MIN_HEIGHT;
+        content.addChild(serverLabel);
+
+        // Server combo box
+        _serverCombo = new ComboBox();
+        content.addChild(_serverCombo);
+    }
+
     private void setupModelSelector()
     {
         auto content = _dialog;
@@ -70,24 +96,41 @@ class DlangUISettingsDialog : ISettingsDialog
 
         // Model combo box
         _modelCombo = new ComboBox();
-        populateModelComboBox();
         content.addChild(_modelCombo);
+    }
+
+    private void populateServerComboBox()
+    {
+        auto presets = _presetManager.getAllPresets();
+        string[] serverNames = presets.map!(p => p.name).array;
+
+        _serverCombo.items = serverNames.map!(name => to!dstring(name)).array;
+
+        // Load models for the selected server
+        loadModelsForSelectedServer(_serverCombo.selectedItemIndex);
     }
 
     private void populateModelComboBox()
     {
-        string[] models = LLMClient.supportedModels();
-        _modelCombo.items = models.map!(m => to!dstring(m)).array;
-
-        // Select current model if available
-        string currentModel = _client.model;
-        foreach (i; 0 .. _modelCombo.items.length)
+        if (_availableModels !is null)
         {
-            if (equal(_modelCombo.items[i].value, currentModel))
+            string[] modelIds = _availableModels.map!(m => m.id).array;
+
+            _modelCombo.items = modelIds.map!(id => to!dstring(id)).array;
+
+         // Select current model if available
+            string currentModel = _client.model;
+            foreach (i; 0 .. _modelCombo.items.length)
             {
-                _modelCombo.selectedItemIndex = i;
-                break;
-            }
+             if (equal(_modelCombo.items[i].value, currentModel))
+                {
+                    _modelCombo.selectedItemIndex = i;
+                    break;
+             }
+        }
+        }else {
+            auto items = new dstring[0];
+            _modelCombo.items = items;
         }
     }
 
@@ -140,6 +183,9 @@ class DlangUISettingsDialog : ISettingsDialog
         // Wire button events
         okButton.click = &onSettingsOkClicked;
         cancelButton.click = &onSettingsCancelClicked;
+
+        // Wire server selection change event
+        _serverCombo.itemClick = &onServerChanged;
     }
 
     private bool onSettingsOkClicked(Widget w)
@@ -149,6 +195,7 @@ class DlangUISettingsDialog : ISettingsDialog
         string newModel = to!string(selectedModel.value);
         bool modelChanged = (_client.model != newModel);
         _client.model = newModel;
+        _chatContext.selectedModel = newModel;
 
         // Apply system message
         _chatContext.systemMessage = to!string(_systemBox.text);
@@ -166,6 +213,46 @@ class DlangUISettingsDialog : ISettingsDialog
     private bool onSettingsCancelClicked(Widget w)
     {
         _dialog.close(null);
+        return true;
+    }
+
+    private void loadModelsForSelectedServer(int itemIndex)
+    {
+        UIString selectedServer = _serverCombo.items[itemIndex];
+        string serverName = to!string(selectedServer.value);
+
+        // Load preset and get models
+        try
+        {
+            auto preset = _presetManager.getPreset(p => p.name == serverName);
+
+            // Update the main client's configuration
+            _client.baseUrl = preset.server;
+            _client.apiKey = preset.token;
+            _chatContext.selectedServer = preset.server;
+
+            // Load models using the main client (now configured with the preset)
+            _availableModels = _client.getAvailableModels();
+
+            populateModelComboBox();
+
+            // Select first model if available
+            if (_availableModels.length > 0)
+            {
+                _modelCombo.selectedItemIndex = 0;
+            }
+        }
+        catch (Exception e)
+        {
+            writeln("Warning: Failed to load models for server ", serverName, ": ", e.msg);
+            _availableModels = [];
+            populateModelComboBox();
+        }
+    }
+
+    private bool onServerChanged(Widget source, int itemIndex)
+    {
+        loadModelsForSelectedServer(itemIndex);
         return true;
     }
 }

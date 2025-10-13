@@ -1,0 +1,16 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/lesson-addresses-pointers-dynamicmemory
+lesson-addresses-pointers-dynamicmemory.so
+lesson-addresses-pointers-dynamicmemory.dylib
+lesson-addresses-pointers-dynamicmemory.dll
+lesson-addresses-pointers-dynamicmemory.a
+lesson-addresses-pointers-dynamicmemory.lib
+lesson-addresses-pointers-dynamicmemory-test-*
+*.exe
+*.pdb
+*.o
+*.obj
+*.lst
