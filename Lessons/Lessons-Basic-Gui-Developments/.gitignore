@@ -1,0 +1,16 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/lessons-basic-gui-developments
+lessons-basic-gui-developments.so
+lessons-basic-gui-developments.dylib
+lessons-basic-gui-developments.dll
+lessons-basic-gui-developments.a
+lessons-basic-gui-developments.lib
+lessons-basic-gui-developments-test-*
+*.exe
+*.pdb
+*.o
+*.obj
+*.lst
