@@ -14,3 +14,4 @@ lessons-basic-gui-developments-test-*
 *.o
 *.obj
 *.lst
+externals
