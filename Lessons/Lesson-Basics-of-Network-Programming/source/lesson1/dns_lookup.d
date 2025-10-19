@@ -68,6 +68,8 @@ private:
         mockRecords["mail.example.com MX"] = DNSRecord("mail.example.com", RecordType.MX, "mailserver.example.com", 3600);
         mockRecords["example.com NS"] = DNSRecord("example.com", RecordType.NS, "ns1.example.com", 3600);
         mockRecords["example.com TXT"] = DNSRecord("example.com", RecordType.TXT, "\"v=spf1 -all\"", 3600);
+        mockRecords["nonexistent.domain A"] = DNSRecord("nonexistent.domain", RecordType.A, "NXDOMAIN", 3600);
+
 
         // Mock records for google.com
         mockRecords["google.com A"] = DNSRecord("google.com", RecordType.A, "142.250.184.78", 300);

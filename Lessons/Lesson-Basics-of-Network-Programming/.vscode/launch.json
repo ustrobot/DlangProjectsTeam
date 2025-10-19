@@ -36,6 +36,27 @@
             "preLaunchTask": "Build debug",
             "postDebugTask": "",
             "internalConsoleOptions": "openOnSessionStart"
+        },
+        {
+            "name": "Debug Tests with cppdbg",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/lesson-basics-of-network-programming-test-library",
+            "args": ["--test"],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Build tests",
+            "postDebugTask": "",
+            "internalConsoleOptions": "openOnSessionStart"
         }
 
     ]

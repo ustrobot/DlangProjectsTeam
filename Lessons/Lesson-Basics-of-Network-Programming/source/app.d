@@ -36,6 +36,42 @@ import lesson4.json_payload;
 import lesson4.httpbin_test;
 import lesson4.custom_headers;
 
+import lesson5.curl_multi_intro;
+import lesson5.parallel_requests;
+import lesson5.event_loop;
+import lesson5.handle_management;
+import lesson5.multi_api_fetch;
+
+import lesson6.rest_principles;
+import lesson6.status_codes;
+import lesson6.bearer_auth;
+import lesson6.api_key_auth;
+import lesson6.openweather_api;
+
+import lesson7.json_basics;
+import lesson7.json_value;
+import lesson7.json_extraction;
+import lesson7.weather_struct;
+import lesson7.advanced_json;
+
+import lesson8.curl_errors;
+import lesson8.retry_logic;
+import lesson8.exponential_backoff;
+import lesson8.rate_limit_handling;
+import lesson8.robust_http_client;
+
+import lesson9.tls_verification;
+import lesson9.certificate_handling;
+import lesson9.openai_api_contract;
+import lesson9.secure_auth;
+import lesson9.api_testing;
+
+import lesson10.request_builders;
+import lesson10.response_parsers;
+import lesson10.conversation_management;
+import lesson10.logging;
+import lesson10.chat_application;
+
 void main() {
     showMainMenu();
 }
@@ -86,25 +122,25 @@ void showMainMenu() {
                     showLesson3Menu();
                     break;
                 case 4:
-                    showLessonMenu("POST Requests & Payloads", &showLesson4Menu);
+                    showLesson4Menu();
                     break;
                 case 5:
-                    showLessonMenu("Asynchronous Requests with `CurlMulti`", &showLesson5Menu);
+                    showLesson5Menu();
                     break;
                 case 6:
-                    showLessonMenu("REST APIs & Authentication", &showLesson6Menu);
+                    showLesson6Menu();
                     break;
                 case 7:
-                    showLessonMenu("JSON Handling in D", &showLesson7Menu);
+                    showLesson7Menu();
                     break;
                 case 8:
-                    showLessonMenu("Error Handling, Retries & Rate Limits", &showLesson8Menu);
+                    showLesson8Menu();
                     break;
                 case 9:
-                    showLessonMenu("Secure HTTPS & OpenAI API Specifics", &showLesson9Menu);
+                    showLesson9Menu();
                     break;
                 case 10:
-                    showLessonMenu("Capstone Project - Chat with an LLM", &showLesson10Menu);
+                    showLesson10Menu();
                     break;
                 case 0:
                     writeln("Exiting program. Goodbye!");
@@ -362,87 +398,366 @@ void showLesson4Menu() {
 }
 
 /**
- * Display menu for Lesson 5 (placeholder for now)
+ * Display menu for Lesson 5
  */
 void showLesson5Menu() {
-    clearScreen();
-    writeln("=================================================");
-    writeln("  LESSON 5: ASYNCHRONOUS REQUESTS WITH `CurlMulti`");
-    writeln("=================================================");
-    writeln();
-    writeln("Lesson 5 examples are not yet implemented.");
-    writeln("Press Enter to return to main menu...");
-    readln();
+    while (true) {
+        clearScreen();
+        writeln("=================================================");
+        writeln("  LESSON 5: ASYNCHRONOUS REQUESTS WITH `CurlMulti`");
+        writeln("=================================================");
+        writeln();
+        writeln("Select an example:");
+        writeln("  1. CurlMulti Introduction");
+        writeln("  2. Parallel Requests");
+        writeln("  3. Event Loop");
+        writeln("  4. Handle Management (disabled - CurlMulti not available)");
+        writeln("  5. Multi API Fetch");
+        writeln("  0. Back to Main Menu");
+        writeln();
+        write("Enter your choice (0-5): ");
+
+        string input = readln().strip();
+
+        // Handle empty input
+        if (input.empty) {
+            continue;
+        }
+
+        try {
+            int choice = to!int(input);
+
+            switch (choice) {
+                case 1:
+                    runExample("CurlMulti Introduction", &lesson5.curl_multi_intro.runExample);
+                    break;
+                case 2:
+                    runExample("Parallel Requests", &lesson5.parallel_requests.runExample);
+                    break;
+                case 3:
+                    runExample("Event Loop", &lesson5.event_loop.runExample);
+                    break;
+                case 4:
+                    writeln("Handle Management example is disabled (CurlMulti not available in std.net.curl).");
+                    writeln("Press Enter to continue...");
+                    readln();
+                    break;
+                case 5:
+                    runExample("Multi API Fetch", &lesson5.multi_api_fetch.runExample);
+                    break;
+                case 0:
+                    return;
+                default:
+                    writeln("Invalid choice. Press Enter to continue...");
+                    readln();
+                    break;
+            }
+        } catch (Exception e) {
+            writeln("Invalid input. Press Enter to continue...");
+            readln();
+        }
+    }
 }
 
 /**
- * Display menu for Lesson 6 (placeholder for now)
+ * Display menu for Lesson 6
  */
 void showLesson6Menu() {
-    clearScreen();
-    writeln("=================================================");
-    writeln("  LESSON 6: REST APIs & AUTHENTICATION");
-    writeln("=================================================");
-    writeln();
-    writeln("Lesson 6 examples are not yet implemented.");
-    writeln("Press Enter to return to main menu...");
-    readln();
+    while (true) {
+        clearScreen();
+        writeln("=================================================");
+        writeln("  LESSON 6: REST APIs & AUTHENTICATION");
+        writeln("=================================================");
+        writeln();
+        writeln("Select an example:");
+        writeln("  1. REST Principles");
+        writeln("  2. Status Codes");
+        writeln("  3. Bearer Authentication");
+        writeln("  4. API Key Authentication");
+        writeln("  5. OpenWeather API");
+        writeln("  0. Back to Main Menu");
+        writeln();
+        write("Enter your choice (0-5): ");
+
+        string input = readln().strip();
+
+        // Handle empty input
+        if (input.empty) {
+            continue;
+        }
+
+        try {
+            int choice = to!int(input);
+
+            switch (choice) {
+                case 1:
+                    runExample("REST Principles", &lesson6.rest_principles.runExample);
+                    break;
+                case 2:
+                    runExample("Status Codes", &lesson6.status_codes.runExample);
+                    break;
+                case 3:
+                    runExample("Bearer Authentication", &lesson6.bearer_auth.runExample);
+                    break;
+                case 4:
+                    runExample("API Key Authentication", &lesson6.api_key_auth.runExample);
+                    break;
+                case 5:
+                    runExample("OpenWeather API", &lesson6.openweather_api.runExample);
+                    break;
+                case 0:
+                    return;
+                default:
+                    writeln("Invalid choice. Press Enter to continue...");
+                    readln();
+                    break;
+            }
+        } catch (Exception e) {
+            writeln("Invalid input. Press Enter to continue...");
+            readln();
+        }
+    }
 }
 
+
 /**
- * Display menu for Lesson 7 (placeholder for now)
+ * Display menu for Lesson 7
  */
 void showLesson7Menu() {
-    clearScreen();
-    writeln("=================================================");
-    writeln("  LESSON 7: JSON HANDLING IN D");
-    writeln("=================================================");
-    writeln();
-    writeln("Lesson 7 examples are not yet implemented.");
-    writeln("Press Enter to return to main menu...");
-    readln();
+    while (true) {
+        clearScreen();
+        writeln("=================================================");
+        writeln("  LESSON 7: JSON HANDLING IN D");
+        writeln("=================================================");
+        writeln();
+        writeln("Select an example:");
+        writeln("  1. JSON Basics");
+        writeln("  2. Working with JsonValue");
+        writeln("  3. JSON Field Extraction");
+        writeln("  4. Weather API JSON to Struct");
+        writeln("  5. Advanced JSON Handling");
+        writeln("  0. Back to Main Menu");
+        writeln();
+        write("Enter your choice (0-5): ");
+
+        string input = readln().strip();
+
+        // Handle empty input
+        if (input.empty) {
+            continue;
+        }
+
+        try {
+            int choice = to!int(input);
+
+            switch (choice) {
+                case 1:
+                    runExample("JSON Basics", &lesson7.json_basics.runExample);
+                    break;
+                case 2:
+                    runExample("Working with JsonValue", &lesson7.json_value.runExample);
+                    break;
+                case 3:
+                    runExample("JSON Field Extraction", &lesson7.json_extraction.runExample);
+                    break;
+                case 4:
+                    runExample("Weather API JSON to Struct", &lesson7.weather_struct.runExample);
+                    break;
+                case 5:
+                    runExample("Advanced JSON Handling", &lesson7.advanced_json.runExample);
+                    break;
+                case 0:
+                    return;
+                default:
+                    writeln("Invalid choice. Press Enter to continue...");
+                    readln();
+                    break;
+            }
+        } catch (Exception e) {
+            writeln("Invalid input. Press Enter to continue...");
+            readln();
+        }
+    }
 }
 
 /**
- * Display menu for Lesson 8 (placeholder for now)
+ * Display menu for Lesson 8
  */
 void showLesson8Menu() {
-    clearScreen();
-    writeln("=================================================");
-    writeln("  LESSON 8: ERROR HANDLING, RETRIES & RATE LIMITS");
-    writeln("=================================================");
-    writeln();
-    writeln("Lesson 8 examples are not yet implemented.");
-    writeln("Press Enter to return to main menu...");
-    readln();
+    while (true) {
+        clearScreen();
+        writeln("=================================================");
+        writeln("  LESSON 8: ERROR HANDLING, RETRIES & RATE LIMITS");
+        writeln("=================================================");
+        writeln();
+        writeln("Select an example:");
+        writeln("  1. curl Error Codes");
+        writeln("  2. Retry Logic");
+        writeln("  3. Exponential Backoff");
+        writeln("  4. Rate Limit Handling");
+        writeln("  5. Robust HTTP Client");
+        writeln("  0. Back to Main Menu");
+        writeln();
+        write("Enter your choice (0-5): ");
+
+        string input = readln().strip();
+
+        // Handle empty input
+        if (input.empty) {
+            continue;
+        }
+
+        try {
+            int choice = to!int(input);
+
+            switch (choice) {
+                case 1:
+                    runExample("curl Error Codes", &lesson8.curl_errors.runExample);
+                    break;
+                case 2:
+                    runExample("Retry Logic", &lesson8.retry_logic.runExample);
+                    break;
+                case 3:
+                    runExample("Exponential Backoff", &lesson8.exponential_backoff.runExample);
+                    break;
+                case 4:
+                    runExample("Rate Limit Handling", &lesson8.rate_limit_handling.runExample);
+                    break;
+                case 5:
+                    runExample("Robust HTTP Client", &lesson8.robust_http_client.runExample);
+                    break;
+                case 0:
+                    return;
+                default:
+                    writeln("Invalid choice. Press Enter to continue...");
+                    readln();
+                    break;
+            }
+        } catch (Exception e) {
+            writeln("Invalid input. Press Enter to continue...");
+            readln();
+        }
+    }
 }
 
 /**
- * Display menu for Lesson 9 (placeholder for now)
+ * Display menu for Lesson 9
  */
 void showLesson9Menu() {
-    clearScreen();
-    writeln("=================================================");
-    writeln("  LESSON 9: SECURE HTTPS & OPENAI API SPECIFICS");
-    writeln("=================================================");
-    writeln();
-    writeln("Lesson 9 examples are not yet implemented.");
-    writeln("Press Enter to return to main menu...");
-    readln();
+    while (true) {
+        clearScreen();
+        writeln("=================================================");
+        writeln("  LESSON 9: SECURE HTTPS & OPENAI API SPECIFICS");
+        writeln("=================================================");
+        writeln();
+        writeln("Select an example:");
+        writeln("  1. TLS Verification");
+        writeln("  2. Certificate Handling");
+        writeln("  3. OpenAI API Contract");
+        writeln("  4. Secure Authentication");
+        writeln("  5. API Testing");
+        writeln("  0. Back to Main Menu");
+        writeln();
+        write("Enter your choice (0-5): ");
+
+        string input = readln().strip();
+
+        // Handle empty input
+        if (input.empty) {
+            continue;
+        }
+
+        try {
+            int choice = to!int(input);
+
+            switch (choice) {
+                case 1:
+                    runExample("TLS Verification", &lesson9.tls_verification.runExample);
+                    break;
+                case 2:
+                    runExample("Certificate Handling", &lesson9.certificate_handling.runExample);
+                    break;
+                case 3:
+                    runExample("OpenAI API Contract", &lesson9.openai_api_contract.runExample);
+                    break;
+                case 4:
+                    runExample("Secure Authentication", &lesson9.secure_auth.runExample);
+                    break;
+                case 5:
+                    runExample("API Testing", &lesson9.api_testing.runExample);
+                    break;
+                case 0:
+                    return;
+                default:
+                    writeln("Invalid choice. Press Enter to continue...");
+                    readln();
+                    break;
+            }
+        } catch (Exception e) {
+            writeln("Invalid input. Press Enter to continue...");
+            readln();
+        }
+    }
 }
 
 /**
- * Display menu for Lesson 10 (placeholder for now)
+ * Display menu for Lesson 10
  */
 void showLesson10Menu() {
-    clearScreen();
-    writeln("=================================================");
-    writeln("  LESSON 10: CAPSTONE PROJECT - CHAT WITH AN LLM");
-    writeln("=================================================");
-    writeln();
-    writeln("Lesson 10 examples are not yet implemented.");
-    writeln("Press Enter to return to main menu...");
-    readln();
+    while (true) {
+        clearScreen();
+        writeln("=================================================");
+        writeln("  LESSON 10: CAPSTONE PROJECT - CHAT WITH AN LLM");
+        writeln("=================================================");
+        writeln();
+        writeln("Select an example:");
+        writeln("  1. Request Builders");
+        writeln("  2. Response Parsers");
+        writeln("  3. Conversation Management");
+        writeln("  4. Logging");
+        writeln("  5. Complete Chat Application");
+        writeln("  0. Back to Main Menu");
+        writeln();
+        write("Enter your choice (0-5): ");
+
+        string input = readln().strip();
+
+        // Handle empty input
+        if (input.empty) {
+            continue;
+        }
+
+        try {
+            int choice = to!int(input);
+
+            switch (choice) {
+                case 1:
+                    runExample("Request Builders", &lesson10.request_builders.runExample);
+                    break;
+                case 2:
+                    runExample("Response Parsers", &lesson10.response_parsers.runExample);
+                    break;
+                case 3:
+                    runExample("Conversation Management", &lesson10.conversation_management.runExample);
+                    break;
+                case 4:
+                    runExample("Logging", &lesson10.logging.runExample);
+                    break;
+                case 5:
+                    runExample("Complete Chat Application", &lesson10.chat_application.runExample);
+                    break;
+                case 0:
+                    return;
+                default:
+                    writeln("Invalid choice. Press Enter to continue...");
+                    readln();
+                    break;
+            }
+        } catch (Exception e) {
+            writeln("Invalid input. Press Enter to continue...");
+            readln();
+        }
+    }
 }
 
 /**

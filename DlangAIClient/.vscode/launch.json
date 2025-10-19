@@ -6,8 +6,9 @@
     "configurations": [
         {
             "name": "Debug with DlangUI",
-            "type": "gdb",
+            "type": "cppdbg",
             "request": "launch",
+            "program": "${workspaceFolder}/dlang-ai-client",
             "target": "./dlang-ai-client",
             "cwd": "${workspaceRoot}",
             "arguments": "--UI=dlangui",
@@ -19,8 +20,9 @@
         },
         {
             "name": "Debug with GTK-D",
-            "type": "gdb",
+            "type": "cppdbg",
             "request": "launch",
+            "program": "${workspaceFolder}/dlang-ai-client",
             "target": "./dlang-ai-client",
             "cwd": "${workspaceRoot}",
             "arguments": "--UI=gtk-d",
