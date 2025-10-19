@@ -1,0 +1,16 @@
+.dub
+docs.json
+__dummy.html
+docs/
+lesson-basics-of-network-programming
+lesson-basics-of-network-programming.so
+lesson-basics-of-network-programming.dylib
+lesson-basics-of-network-programming.dll
+lesson-basics-of-network-programming.a
+lesson-basics-of-network-programming.lib
+lesson-basics-of-network-programming-test-*
+*.exe
+*.pdb
+*.o
+*.obj
+*.lst

@@ -1,0 +1,9 @@
+{
+	"authors": [
+		"grolm"
+	],
+	"copyright": "Copyright © 2025, grolm",
+	"description": "A minimal D application.",
+	"license": "MIT",
+	"name": "lesson-basics-of-network-programming"
+}
