@@ -620,3 +620,4 @@ unittest {
     writeln("All openai_api_contract tests passed!");
     writeln("=== openai_api_contract tests completed ===");
 }
+
