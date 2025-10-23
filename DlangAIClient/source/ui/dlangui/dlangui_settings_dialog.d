@@ -118,17 +118,19 @@ class DlangUISettingsDialog : ISettingsDialog
 
             _modelCombo.items = modelIds.map!(id => to!dstring(id)).array;
 
-         // Select current model if available
+            // Select current model if available
             string currentModel = _client.model;
             foreach (i; 0 .. _modelCombo.items.length)
             {
-             if (equal(_modelCombo.items[i].value, currentModel))
+                if (equal(_modelCombo.items[i].value, currentModel))
                 {
                     _modelCombo.selectedItemIndex = i;
                     break;
-             }
+                }
+            }
         }
-        }else {
+        else
+        {
             auto items = new dstring[0];
             _modelCombo.items = items;
         }
@@ -191,20 +193,23 @@ class DlangUISettingsDialog : ISettingsDialog
     private bool onSettingsOkClicked(Widget w)
     {
         // Apply selected model
-        UIString selectedModel = _modelCombo.items[_modelCombo.selectedItemIndex];
+        UIString selectedModel = _modelCombo.selectedItemIndex >= 0 ? _modelCombo
+            .items[_modelCombo.selectedItemIndex] : UIString(""d);
         string newModel = to!string(selectedModel.value);
         bool modelChanged = (_client.model != newModel);
-        _client.model = newModel;
-        _chatContext.selectedModel = newModel;
+
+        if (newModel && newModel.length > 0 && modelChanged)
+        {
+            _client.model = newModel;
+            _chatContext.selectedModel = newModel;
+            if (_onModelChanged !is null)
+            {
+                _onModelChanged();
+            }
+        }
 
         // Apply system message
         _chatContext.systemMessage = to!string(_systemBox.text);
-
-        // Notify if model changed
-        if (modelChanged && _onModelChanged !is null)
-        {
-            _onModelChanged();
-        }
 
         _dialog.close(null);
         return true;
