@@ -31,9 +31,10 @@ void runExample() {
     // 2. Resizing dynamic arrays
     writeln("\n2. Resizing Dynamic Arrays:");
     
+    writefln("  Before resize: %s, length: %d  %x", sizedArray, sizedArray.length, sizedArray.ptr);
     // Resize by assignment
     sizedArray.length = 10;
-    writefln("  After resize to 10: %s, length: %d", sizedArray, sizedArray.length);
+    writefln("  After resize to 10: %s, length: %d  %x", sizedArray, sizedArray.length, sizedArray.ptr);
     
     // Fill with values
     foreach (i; 0..sizedArray.length) {
@@ -43,8 +44,22 @@ void runExample() {
     
     // Shrink the array
     sizedArray.length = 5;
-    writefln("  After shrinking to 5: %s, length: %d", sizedArray, sizedArray.length);
+    writefln("  After shrinking to 5: %s, length: %d   %x", sizedArray, sizedArray.length, sizedArray.ptr);
+    writefln("  Element 0: %d", sizedArray.ptr[0]);
+    writefln("  Element 1: %d", sizedArray.ptr[1]);
+    writefln("  Element 2: %d", sizedArray.ptr[2]);
+    writefln("  Element 3: %d", sizedArray.ptr[3]);
+    writefln("  Element 4: %d", sizedArray.ptr[4]);
+    writefln("  Element 5: %d", sizedArray.ptr[5]);
+    writefln("  Element 6: %d", sizedArray.ptr[6]);
+    writefln("  Element 7: %d", sizedArray.ptr[7]);
+    writefln("  Element 8: %d", sizedArray.ptr[8]);
+    writefln("  Element 9: %d", sizedArray.ptr[9]);
     
+    sizedArray.length = 10;
+    writefln("  After shrinking to 10: %s, length: %d  %x", sizedArray, sizedArray.length, sizedArray.ptr);
+
+
     // 3. Adding elements to dynamic arrays
     writeln("\n3. Adding Elements to Dynamic Arrays:");
     
@@ -71,16 +86,24 @@ void runExample() {
     int[] capacityDemo;
     writeln("\n  Growing an array one element at a time:");
     
-    foreach (i; 0..10) {
+    int* oldPtr;
+    foreach (i; 0..100) {
         size_t oldLength = capacityDemo.length;
+        oldPtr = capacityDemo.ptr;
         capacityDemo ~= i;
         writefln("    Added element %d, length: %d", i, capacityDemo.length);
         
         // Check if address changed (reallocation occurred)
-        if (oldLength > 0 && capacityDemo.ptr != (capacityDemo[0..oldLength]).ptr) {
+        if (oldLength > 0 && capacityDemo.ptr != oldPtr) {
             writeln("    Reallocation occurred!");
+            writefln("    Old pointer: %x", oldPtr);
+            writefln("    New pointer: %x", capacityDemo.ptr);
         }
     }
+
+    writeln("The end");
+    writefln("    Old pointer: %x", oldPtr);
+    writefln("    New pointer: %x", capacityDemo.ptr);
     
     // 5. Reserve capacity in advance
     writeln("\n5. Reserve Capacity in Advance:");

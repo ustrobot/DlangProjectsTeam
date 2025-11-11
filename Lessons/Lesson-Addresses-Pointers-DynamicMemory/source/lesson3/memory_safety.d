@@ -23,7 +23,7 @@ void runExample() {
     try {
         // This would cause a segmentation fault in C/C++
         // In D with safety enabled, it throws an Error
-        // *nullPtr = 10;  // Uncomment to see the error
+         *nullPtr = 10;  // Uncomment to see the error
         
         writeln("  D detects null pointer dereferences at runtime (in safe mode)");
         writeln("  This prevents one of the most common causes of crashes");
