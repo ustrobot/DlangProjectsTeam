@@ -104,19 +104,11 @@ void verboseGetRequest() {
     if (result.isSuccess()) {
         writeln("Verbose output:");
         // Show the response content (not the headers for brevity)
-        auto lines = result.stdout.split("\n");
-        bool inBody = false;
-        foreach (line; lines) {
-            if (line.strip().empty) {
-                inBody = true;
-                continue;
-            }
-            if (inBody) {
-                writeln(line);
-                break; // Just show the first line of body
-            }
-        }
-    } else {
+         if (result.stdout.length > 4000) {
+            writeln(result.stdout[0..4000] ~ "...");
+        } else {
+            writeln(result.stdout);
+        } 
         writefln("Failed with exit code: %d", result.exitCode);
     }
 }
@@ -139,6 +131,8 @@ void demonstrateCurlOptions() {
     foreach (i, cmd; curlCommands) {
         writefln("\n--- Command %d ---", i + 1);
         writefln("curl %s", cmd.join(" "));
+
+        cmd = ["curl"] ~ cmd;
 
         try {
             auto result = execute(cmd);
