@@ -9,6 +9,18 @@ module lesson4.node_structure;
 import std.stdio;
 import std.format;
 
+struct Point
+{
+int x;
+int y;
+int z;
+this(int x, int y, int z) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+}
+}
+
 void runExample() {
     writeln("=== Node Structure for Linked Lists Example ===\n");
     
@@ -16,19 +28,30 @@ void runExample() {
     writeln("1. Basic Node Structure:");
     
     // Create a single node
-    Node!int node1 = new Node!int(10);
+    Node!int node1 = new Node!(int)(10);
+    SNode!float* snode = new SNode!float(10);
+
+
+    Object ob = node1;
+    writeln("Alien object:", ob);
+
+    Point p  = Point(10,20,30);
+    Node!Point pnode = new Node!Point(p);
     writefln("  Created a node with value: %d", node1.value);
     writefln("  Node1 next pointer: %s", node1.next is null ? "null" : "points to another node");
     
     // Create another node
     Node!int node2 = new Node!int(20);
+    SNode!float* snode2 = new SNode!float(10);
     writefln("  Created another node with value: %d", node2.value);
     
     // Link the nodes
     node1.next = node2;
+    snode.next = snode2;
     writefln("  Linked node1 to node2");
     writefln("  Node1 next pointer: %s", node1.next is null ? "null" : "points to another node");
     writefln("  Value in the next node: %d", node1.next.value);
+    writefln("  Value in the next node: %f", snode.next.value);
     
     // 2. Create a small linked list manually
     writeln("\n2. Creating a Small Linked List Manually:");
@@ -125,6 +148,16 @@ void runExample() {
     writeln("3. Nodes can store any data type using generics/templates");
     writeln("4. Doubly-linked nodes contain references to both next and previous nodes");
     writeln("5. Node structures are the foundation of many dynamic data structures");
+}
+
+struct SNode(T) {
+    T value;           // The data stored in this node
+    SNode!T* next;       // Reference to the next node
+    
+    this(T value) {
+        this.value = value;
+        this.next = null;
+    }
 }
 
 /**
