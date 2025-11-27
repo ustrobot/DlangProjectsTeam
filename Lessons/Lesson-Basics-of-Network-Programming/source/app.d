@@ -76,10 +76,29 @@ void main() {
     showMainMenu();
 }
 
+
+struct TTest {
+
+    this(string s)
+    {
+        this._s = s;
+    }
+
+    string _s;
+}
+
+void test()
+{
+    TTest t = TTest("test");
+    writeln(t._s);
+}
 /**
  * Display the main menu with lesson options
  */
 void showMainMenu() {
+
+    test();
+
     while (true) {
         clearScreen();
         writeln("===============================================");

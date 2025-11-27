@@ -13,6 +13,8 @@ import std.string;
 import std.conv;
 import std.algorithm;
 
+import core.time;
+
 /**
  * Simple GET request using std.curl
  */
@@ -82,7 +84,9 @@ void getWithTimeout() {
 void demonstrateHttpMethods() {
     writeln("\n=== HTTP Methods with std.curl ===");
 
-    string[] methods = ["GET", "POST", "PUT", "DELETE"];
+    HTTP.Method[] allMethods = [HTTP.Method.get, HTTP.Method.post, HTTP.Method.put, HTTP.Method.del];
+
+    //string[] methods = ["GET", "POST", "PUT", "DELETE"];
     string[] endpoints = [
         "https://httpbin.org/get",
         "https://httpbin.org/post",
@@ -90,29 +94,35 @@ void demonstrateHttpMethods() {
         "https://httpbin.org/delete"
     ];
 
-    foreach (i, method; methods) {
+    foreach (i, method; allMethods) {
         try {
             writefln("--- %s Request ---", method);
 
             auto http = HTTP(endpoints[i]);
             string response;
 
+            http.method = method;
             // Set method based on the index
-            if (i == 1) { // POST
-                http.method = HTTP.Method.post;
+            switch (method) 
+            { 
+                case HTTP.Method.post: // POST
                 http.postData = "test=data&message=hello";
-            } else if (i == 2) { // PUT
-                http.method = HTTP.Method.put;
+                break;
+                case HTTP.Method.put: // PUT
                 http.postData = `{"action": "update", "status": "ok"}`;
-            } else if (i == 3) { // DELETE
-                http.method = HTTP.Method.del;
-            }
-            // GET is default
+                break;
+                default:{}
+            } 
 
             http.onReceive = (ubyte[] data) {
                 response ~= cast(string)data;
                 return data.length;
             };
+
+            http.connectTimeout = dur!"seconds"(10);
+            http.dataTimeout = dur!"seconds"(10);
+            http.operationTimeout = dur!"seconds"(10);
+            http.dnsTimeout = dur!"seconds"(10);
 
             http.perform();
 
