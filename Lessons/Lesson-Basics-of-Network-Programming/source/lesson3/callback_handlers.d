@@ -52,11 +52,8 @@ void demonstrateBasicCallbacks() {
 
             // Process data in chunks
             string chunk = cast(string)data;
-            if (chunk.length > 50) {
-                writefln("Received chunk: %s...", chunk[0..50]);
-            } else {
-                writefln("Received chunk: %s", chunk);
-            }
+            
+            writefln("Received chunk: %s...", chunk[0..data.length]);
 
             return data.length; // Return amount processed
         };
